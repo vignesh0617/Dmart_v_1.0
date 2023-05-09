@@ -12,7 +12,7 @@ from components.navbar import navbar
 
 
 c =0
-app = Dash(name = __name__,external_stylesheets=[dbc.themes.COSMO,dbc.icons.BOOTSTRAP])
+app = Dash(name = __name__,external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.BOOTSTRAP])
 
 app.layout = html.Div(children = [
     dcc.Location(id="url1",refresh=False),

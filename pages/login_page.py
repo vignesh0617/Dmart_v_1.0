@@ -71,7 +71,7 @@ layout= html.Div(children = [
             ])
         ])
     ],
-    className = "col-5 mx-auto position-absolute top-50 start-50 translate-middle transparant"),
+    className = "col-5 mx-auto position-absolute top-50 start-50 translate-middle transparent white-text"),
 ])
 
 

@@ -11,9 +11,11 @@ from helper_functions.custom_helpers import *
 sample_data = px.data.gapminder()
 
 
-body = dbc.Row([
+layout = html.Div(children = [
+    navbar,
+    dbc.Row([
     dbc.Col([
-        "Filters : ",
+        html.Label("Filters : ", className="white-text"),
         dcc.Dropdown( id ="continent_filter",
                         options = sample_data['continent'].sort_values().unique(),
                         value = sample_data['continent'].sort_values().unique()[0]),
@@ -22,22 +24,19 @@ body = dbc.Row([
                         options = sample_data['year'].sort_values().unique(),
                         value = sample_data['year'].sort_values().unique()[0])
         
-    ],width = 3 , className = "border"),
+    ],width = 3 , className = "border-end"),
     dbc.Col([
-        html.H1("Graphs"),
+        html.H1("Graphs",className="white-text"),
         dbc.Spinner(dcc.Graph(id="graph_output")),
         dbc.Modal([
             dbc.ModalHeader(id = "modal_header"),
             dbc.ModalBody(id = "modal_body"),
             dbc.ModalFooter("Footer"),
         ],id ="main_modal" , is_open = False)
-    ],width = 9 , className = "border")
-],style = {"height":"91vh"})
+    ],width = 9 )
+],className = "margin-0 fill-up-body")
+])
 
-page_layout = html.Div([
-    navbar,
-    body
-],className = "vh-100")
 
 
 @callback(Output("graph_output","figure"),Input("continent_filter","value"),Input("year_filter","value"))
@@ -70,6 +69,7 @@ def display_modal(clickData,continent,year,is_open):
 
 
 
-layout = html.Div([
-    page_layout
-])
+# layout = html.Div([
+#     navbar,
+#     body
+# ])

@@ -2,12 +2,27 @@
     background-image: url("Background_Final.png");
     background-position: right top;
     background-repeat: no-repeat;
-    color : white;
-    background-size: 100% 100%;
     height: 100vh;
     width: 100vw;
+    background-color: #000048
 }
 
-.transparant{
-    background: (0,0,0,0.5);
+.margin-0{
+    margin : 0 0 0 0;
+}
+
+.transparent{
+    background: radial-gradient(black,transparent);
+}
+
+.white-text{
+    color : white
+}
+
+.fill-up-body{
+    position: absolute;
+    top: 55px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
