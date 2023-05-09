@@ -1,0 +1,8 @@
+secret_key = my_super_secret_key
+algorithm = HS256
+host = localhost
+session_time_in_secs = 1300
+home_page_link = /home
+about_page_link = /about
+login_page_link = /
+logout_page_link = /logout
