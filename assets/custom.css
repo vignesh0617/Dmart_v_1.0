@@ -19,10 +19,40 @@
     color : white
 }
 
-.fill-up-body{
-    position: absolute;
-    top: 55px;
-    left: 0;
-    right: 0;
-    bottom: 0;
+.navbar{
+    position:fixed;
+    width: 100%;
+    top:0;
+    left:0;
+    display: inline-block;
+    z-index: 10;
+}
+
+.side-filter-tab{
+    position:fixed;
+    left:0;
+    top:56px;
+    height: 100%;
+    width: 30%;
+    display: inline-block;
+    border-right: 2px solid white;
+    z-index: 5;
+    padding: 20px;
+}
+
+.main-content{
+    padding: 76px 10px 0px 20px;
+    top:56px;
+    height: 100%;
+    width: 70%;
+    margin-left: 30%;
+    display: inline-block;
+    overflow: auto;
+    z-index: 1;
+}
+
+.main-container{
+    position: relative;
+    height: 100%;
+    display: flex;
 }
