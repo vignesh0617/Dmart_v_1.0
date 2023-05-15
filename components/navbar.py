@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-from helper_functions.custom_helpers import main_app
+from callback_functions.custom_helpers import main_app
 from dash import html
 
 

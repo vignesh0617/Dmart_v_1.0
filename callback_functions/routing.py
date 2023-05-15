@@ -1,9 +1,12 @@
-from helper_functions.custom_helpers import main_app,decode_token
+from callback_functions.custom_helpers import main_app,decode_token
+from dash.dependencies import Output, Input, State
 from pages.about_page import layout as about_page
 from pages.home_page import layout as home_page
 from pages.login_page import layout as login_page
 from pages.page_not_found import layout as page_not_found
 import time
+
+# app = main_app.app
 
 c = 0
 
@@ -14,6 +17,12 @@ c = 0
 # It takes 2 inpiuts (1 input and 1 state)
 # Input -> url1 components pathname
 # State -> token components data
+@main_app.app.callback(
+    Output("url2","pathname"),
+    Output("app_output","children"),
+    Output("token","clear_data"),
+    Input("url1","pathname"),
+    State("token","data"))
 def validate_token_and_update_screen(pathname,token):
     global c
     c+=1

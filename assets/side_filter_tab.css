@@ -1,0 +1,25 @@
+.side-filter-tab-container{
+    position:fixed;
+    left:calc(-1*(30% - 30px));
+    top:56px;
+    height: 100%;
+    width: 30%;
+    display: inline-block;
+    border-right: 2px solid white;
+    z-index: 5;
+    padding: 20px;
+    background-color: #e1e1f2;
+    transition: all 0.3s ease;
+}
+
+.side-filter-tab-contents{
+    position: relative;
+    width: 100%;
+    display: inline-block;
+}
+
+.arrow-position{
+    position: absolute;
+    right: 0;
+    transform: translate(50%,0%);
+}

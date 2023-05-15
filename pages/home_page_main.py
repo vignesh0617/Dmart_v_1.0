@@ -6,7 +6,7 @@ from components.navbar import navbar
 from dash import callback, dcc, html
 from dash.dependencies import Input, Output , State
 from dash.exceptions import PreventUpdate
-from helper_functions.custom_helpers import *
+from callback_functions.custom_helpers import *
 
 sample_data = px.data.gapminder()
 
