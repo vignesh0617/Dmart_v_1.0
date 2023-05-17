@@ -50,7 +50,7 @@ layout= html.Div(children = [
                 dbc.Col([
                     dbc.InputGroup([
                         dbc.Input(id="password",type="password"),
-                        dbc.Button(className="bi bi-eye", id = "show_hide_password" ),
+                        dbc.Button(className="bi bi-eye", id = "show_hide_password" , style= {"border-radius": "0px 7px 7px 0px"}),
                         dbc.FormFeedback("Password can not be empty", type="invalid")
                     ])                    
                 ],width = 9)

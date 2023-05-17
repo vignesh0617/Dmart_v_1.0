@@ -6,6 +6,7 @@ class reconciliation_app:
     def __init__(self):
         self.app = Dash(name = "__main__",external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.BOOTSTRAP])
         self.connector = None
+        self.cursor = None
         self.year_filter = ""
         self.continent_filter = ""
         self.label = ""

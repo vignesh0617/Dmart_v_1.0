@@ -19,6 +19,16 @@
     color : white
 }
 
+.error{
+    color: #f03f3f;
+    font-size: large;
+}
+
+.success{
+    color: #4be178;
+    font-size: large;
+}
+
 .navbar{
     position:fixed;
     width: 100%;

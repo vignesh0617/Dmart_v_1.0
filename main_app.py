@@ -13,4 +13,4 @@ main_app.app.layout = html.Div(children = [
     ])
 
 if(__name__ == "__main__"):
-    main_app.app.run_server(port = 8051, debug = True)
+    main_app.app.run_server(port = 8051, debug = False)

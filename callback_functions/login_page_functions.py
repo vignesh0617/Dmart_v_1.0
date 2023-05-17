@@ -22,9 +22,9 @@ def show_hide_password(n_clicks):
 #handles login requests
 @main_app.app.callback(
     Output("token","data"),
-    # Output("refresh","key"),
     Output("url1","pathname"),
     Output("message","children"),
+    Output("message","className"),
     Input("submit_button","n_clicks"),
     State("username","value"),
     State("password","value"),
@@ -34,7 +34,7 @@ def show_hide_password(n_clicks):
 def login_handler(n_clicks,username, password, server):
     
     if username != "" and password != "" and username is not None and password is not None: 
-        main_app.connector, got_connection = get_connection(username = username , password = password)
+        main_app.connector,main_app.cursor, got_connection = get_connection(username = username , password = password)
         if got_connection:
             payload = {
                 "username" : username,
@@ -43,9 +43,9 @@ def login_handler(n_clicks,username, password, server):
             }
             token = create_token(payload= payload)
 
-            return token , main_app.environment_details['home_page_link'], "Login Successfull"
+            return token , main_app.environment_details['home_page_link'], "Login Successfull","success"
         else :
-            return "" , no_update ,"Wrong username or password"
+            return "" , no_update ,"Wrong username or password","error"
     else : 
         raise PreventUpdate
 

@@ -1,7 +1,18 @@
 from dash import html
+import dash_bootstrap_components as dbc
 
 layout = html.Div([
-    "Main contents 1" ,
+    # dbc.Button(
+    #         className="btn-primary bi bi-arrow-right-circle-fill arrow-position-2 show-filter-button",
+    #         id="show-hide-button"),
+    # dbc.Popover(
+    #         children=["Show Filters"],
+    #         id="show-hide-popover",
+    #         target="show-hide-button",
+    #         body=True,
+    #         trigger="hover",
+    #     ),
+    "Main contents 2" ,
     html.Div("inside 1",className="sample"),
     html.Div("inside 2",className="sample"),
     html.Div("inside 3",className="sample"),
