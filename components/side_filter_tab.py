@@ -21,9 +21,11 @@ layout = html.Div([
         ),
         
         dbc.Label ("Filters : ",className = "main-filter-label" ),
-        html.Div([
-            html.Div(id = "filters"),
-        ],className="side-filter-tab-contents"),
+        dbc.Spinner(
+            html.Div([
+                html.Div(id = "filters"),
+            ],className="side-filter-tab-contents")
+            ),
         
 
     ]),
