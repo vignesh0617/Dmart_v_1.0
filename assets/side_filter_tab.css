@@ -13,9 +13,13 @@
 }
 
 .side-filter-tab-contents{
-    position: relative;
-    width: 100%;
-    display: inline-block;
+    position: absolute;
+    height: 80vh;
+}
+
+.side-filter-tab-contents:hover{
+    overflow-y: scroll;
+    overflow-x: visible;
 }
 
 .arrow-position{
