@@ -1,10 +1,12 @@
 # import ctypes
 import jwt
 import dash_bootstrap_components as dbc
-from dash import html
-class app:
+from dash import html, Dash
+class reconciliation_app:
     def __init__(self):
+        self.app = Dash(name = "__main__",external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.BOOTSTRAP])
         self.connector = None
+        self.cursor = None
         self.year_filter = ""
         self.continent_filter = ""
         self.label = ""
@@ -33,7 +35,7 @@ class app:
     def __str__(self) -> str:
         return (f'{self.connector} - {self.environment_details} ')
 
-main_app = app()
+main_app = reconciliation_app()
 
 def create_token(payload, 
                 secret_key = main_app.environment_details['secret_key'], 

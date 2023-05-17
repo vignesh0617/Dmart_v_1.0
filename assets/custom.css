@@ -2,12 +2,103 @@
     background-image: url("Background_Final.png");
     background-position: right top;
     background-repeat: no-repeat;
-    color : white;
-    background-size: 100% 100%;
     height: 100vh;
     width: 100vw;
+    background-color: #000048
 }
 
-.transparant{
-    background: (0,0,0,0.5);
+.margin-0{
+    margin : 0 0 0 0;
+}
+
+.transparent{
+    background: radial-gradient(black,transparent);
+}
+
+.white-text{
+    color : white
+}
+
+.error{
+    color: #f03f3f;
+    font-size: large;
+}
+
+.success{
+    color: #4be178;
+    font-size: large;
+}
+
+.navbar{
+    position:fixed;
+    width: 100%;
+    top:0;
+    left:0;
+    display: inline-block;
+    z-index: 10;
+}
+
+.o-0{
+    opacity: 0;
+}
+
+.o-1{
+    opacity:1;
+}
+
+.z-1{
+    z-index: 1;
+}
+
+.z-0{
+    z-index: 0;
+}
+
+
+.circle{
+    padding: 5px 10px;
+    border-radius: 100%;
+}
+
+.btn-white{
+    cursor: pointer;
+    background-color:rgb(254, 254, 254) ;    
+    z-index: 1;
+}
+
+.btn-animated{
+    transition: all 0.3s ease;
+}
+
+.btn-animated:hover{
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.484);
+}
+
+.btn-animated:active{ 
+    transform: translateY(-2px);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.484);
+}
+
+.btn-white::after{
+    position: absolute;
+    content: "";
+    display: inline-block;
+    background-color: rgb(254, 254, 254);
+    transition: all 0.3s ease;
+    z-index: -1;
+    left: 0;
+    top :0;
+    width: 100%;
+    height: 100%;
+}
+
+.circle::after{
+    padding: 5px 10px;
+    border-radius: 100%;
+}
+
+.btn-animated:hover::after{
+    transform: scale(1.6);
+    opacity: 0;
 }

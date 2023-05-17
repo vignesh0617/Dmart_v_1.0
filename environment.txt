@@ -6,3 +6,6 @@ home_page_link = /home
 about_page_link = /about
 login_page_link = /
 logout_page_link = /logout
+database_name = dmart
+filter_table_names = dqphase,dqruletype,dqsystem,dqsystem,dqsteward
+filter_table_columns = phasename,ruletypename,systemname,priority,stewardname

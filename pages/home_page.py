@@ -6,70 +6,13 @@ from components.navbar import navbar
 from dash import callback, dcc, html
 from dash.dependencies import Input, Output , State
 from dash.exceptions import PreventUpdate
-from helper_functions.custom_helpers import *
+from callback_functions.custom_helpers import *
+from components.side_filter_tab import layout as side_filter_tab
+from components.home_page_contents import layout as home_page_contents
+from callback_functions.home_page_functions import *
 
-sample_data = px.data.gapminder()
-
-
-body = dbc.Row([
-    dbc.Col([
-        "Filters : ",
-        dcc.Dropdown( id ="continent_filter",
-                        options = sample_data['continent'].sort_values().unique(),
-                        value = sample_data['continent'].sort_values().unique()[0]),
-        html.Br(),
-        dcc.Dropdown(id = "year_filter",
-                        options = sample_data['year'].sort_values().unique(),
-                        value = sample_data['year'].sort_values().unique()[0])
-        
-    ],width = 3 , className = "border"),
-    dbc.Col([
-        html.H1("Graphs"),
-        dbc.Spinner(dcc.Graph(id="graph_output")),
-        dbc.Modal([
-            dbc.ModalHeader(id = "modal_header"),
-            dbc.ModalBody(id = "modal_body"),
-            dbc.ModalFooter("Footer"),
-        ],id ="main_modal" , is_open = False)
-    ],width = 9 , className = "border")
-],style = {"height":"91vh"})
-
-page_layout = html.Div([
+layout = html.Div(children=[
     navbar,
-    body
-],className = "vh-100")
-
-
-@callback(Output("graph_output","figure"),Input("continent_filter","value"),Input("year_filter","value"))
-def bar_graph(continent,year):
-    if continent is None or year is None :
-        raise PreventUpdate
-    bar = px.bar(data_frame = sample_data.query("continent == @continent and year == @year"),
-          x = 'country',
-          y = 'pop',
-          title = f"Population in {continent}  Continent in Year : {year}")
-    return bar
-
-
-@callback (
-    Output("modal_header","children"),
-    Output("modal_body","children"),
-    Output("main_modal","is_open"),
-    Input("graph_output","clickData"),
-    State("continent_filter","value"),
-    State("year_filter","value"),
-    State("main_modal","is_open"),
-    prevent_initial_call =True
-    )
-def display_modal(clickData,continent,year,is_open):
-    main_app.label = clickData['points'][0]['label']
-    value = clickData['points'][0]['value']
-    main_app.continent_filter = continent
-    main_app.year_filter = year
-    return f"{main_app.label.title()} - Details Report",[main_app.generate_modal(column,sample_data) for column in sample_data.columns],not is_open
-
-
-
-layout = html.Div([
-    page_layout
-])
+    side_filter_tab,
+    home_page_contents
+],className="main-container")

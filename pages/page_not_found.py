@@ -2,7 +2,7 @@ from dash import html,dcc, callback
 from dash.dependencies import Output,Input,State
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
-from helper_functions.custom_helpers import main_app
+from callback_functions.custom_helpers import main_app
 from components.navbar import navbar
 
 layout = html.Div([
