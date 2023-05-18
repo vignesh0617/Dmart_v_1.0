@@ -7,19 +7,31 @@
     display: inline-block;
     border-right: 2px solid white;
     z-index: 5;
-    padding: 20px 40px;
+    padding: 20px 13px;
     background-color: #e1e1f2;
     transition: all 0.3s ease;
 }
 
 .side-filter-tab-contents{
-    position: absolute;
     height: 80vh;
+    overflow:auto;
 }
 
-.side-filter-tab-contents:hover{
-    overflow-y: scroll;
-    overflow-x: visible;
+/* .side-filter-tab-contents:hover{
+    overflow:auto;
+} */
+
+.side-filter-tab-contents::-webkit-scrollbar{
+    width: 4px;
+    margin: none;
+}
+
+.side-filter-tab-contents::-webkit-scrollbar-thumb{
+    background-color: #b3b3f4;
+}
+
+.side-filter-tab-contents::-webkit-scrollbar-track{
+    background-color: #d0d0f3;
 }
 
 .arrow-position{
@@ -35,9 +47,11 @@
 
 .filter-card{
     background-color: azure;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.568);
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.568);
     padding: 20px;
-    margin :20px 0px;
+    margin :20px auto;
+    width: 90%;
+    
 }
 
 .filter-label {
