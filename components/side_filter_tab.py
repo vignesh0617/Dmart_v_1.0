@@ -10,7 +10,7 @@ layout = html.Div([
         # dbc.Input(id="query",placeholder="Enter your query here"),  # some add on features that can be used later
         # dbc.Button("Fetch Results",id="execute_query"),
         dbc.Button(
-            className="btn-primary bi bi-arrow-right-circle-fill arrow-position show-filter-button",
+            className="circle bi bi-arrow-right-circle-fill arrow-position",
             id="show-hide-button"),
         dbc.Popover(
             children=["Show Filters"],
@@ -20,7 +20,10 @@ layout = html.Div([
             trigger="hover",
         ),
         
-        dbc.Label ("Filters : ",className = "main-filter-label" ),
+        html.Div([
+            dbc.Label ("Filters : ",className = "main-filter-label" ),
+            dbc.Button("Apply", id = "apply_filter_button")
+        ],className="filter-header"),
         dbc.Spinner(
             html.Div([
                 html.Div(id = "filters"),

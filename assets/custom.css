@@ -60,10 +60,16 @@
     border-radius: 100%;
 }
 
-.btn-white{
+.btn{
     cursor: pointer;
+}
+.btn-white{
     background-color:rgb(254, 254, 254) ;    
     z-index: 1;
+}
+
+.btn-light{
+    background-color: rgb(195, 209, 255);
 }
 
 .btn-animated{
@@ -101,4 +107,8 @@
 .btn-animated:hover::after{
     transform: scale(1.6);
     opacity: 0;
+}
+
+.white{
+    background-color: whitesmoke;
 }

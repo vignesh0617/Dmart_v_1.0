@@ -17,6 +17,21 @@
     display: flex;
 }
 
+
+.main-content::-webkit-scrollbar{
+    width: 4px;
+    margin: none;
+}
+
+.main-content::-webkit-scrollbar-thumb{
+    background-color: #8c8cf7;
+}
+
+.main-content::-webkit-scrollbar-track{
+    background-color: #d0d0f3;
+}
+
+
 .refresh_button_position{
     position: fixed;
     font-size: larger;

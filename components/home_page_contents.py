@@ -12,7 +12,7 @@ layout = html.Div([
     #         body=True,
     #         trigger="hover",
     #     ),
-    html.Span(id="refresh_button", className="bi bi-arrow-clockwise refresh_button_position btn-white circle btn-animated"),
+    html.Span(id="refresh_button", className="bi bi-arrow-clockwise refresh_button_position btn btn-white circle btn-animated"),
     dbc.Popover(
         children=["Refresh-data"],
         id = "refresh_button_popover",
@@ -21,8 +21,6 @@ layout = html.Div([
         trigger = "hover",
         placement="top"
     ),
-    "Main contents 2" ,
-    html.Div("inside 1",className="sample"),
-    html.Div("inside 2",className="sample"),
-    html.Div("inside 3",className="sample"),
+    html.Div(id="home_page_contents_top"),
+    html.Div(id="home_page_contents_bottom")
 ],id="main-content-container",className="main-content")
