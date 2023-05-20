@@ -38,3 +38,37 @@
     right: 10px;
     bottom: 10px;
 }
+
+.home-page-contents-top{
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 20px;
+}
+
+.top-table{
+    min-width: 300px;
+    max-width: 20%;
+    width: fit-content;
+    min-height: 205px;
+    max-height: 244px;
+    height: auto;
+    overflow: auto;
+}
+
+thead{
+    position: sticky;
+    top: 0;
+}
+
+.top-table::-webkit-scrollbar{
+    width: 4px;
+    margin: none;
+}
+
+.top-table::-webkit-scrollbar-thumb{
+    background-color: #3d3d59;
+}
+
+.top-table::-webkit-scrollbar-track{
+    background-color: #9f9fcc;
+}

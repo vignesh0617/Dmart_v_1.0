@@ -29,7 +29,7 @@ def show_hide_password(n_clicks):
     State("username","value"),
     State("password","value"),
     State("server","value"),
-    prevent_initital_call =True
+    prevent_initial_call =True
     )
 def login_handler(n_clicks,username, password, server):
     

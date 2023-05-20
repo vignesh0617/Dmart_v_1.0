@@ -1,5 +1,7 @@
-from callback_functions.custom_helpers import main_app
-from callback_functions.home_page_functions import *
+import pandas as pd
+import mysql.connector as sql
 
-create_filter_buttons()
+connector =  sql.connnect(username = "root", password = "root" , host = "localhost", database = "dmart")
+
+df = pd.read_sql(sql = "select * from dqsteward")
 
