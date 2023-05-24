@@ -9,3 +9,4 @@ logout_page_link = /logout
 database_name = dmart
 filter_table_names = dqphase,dqruletype,dqsystem,dqsystem,dqsteward
 filter_table_columns = phasename,ruletypename,systemname,priority,stewardname
+filter_table_labels = Phase Name,Rule Type Name,System Name,Priority,Steward Name

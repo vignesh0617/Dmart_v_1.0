@@ -60,10 +60,11 @@
     border-radius: 100%;
 }
 
-.btn{
+/* .btn{
     cursor: pointer;
-}
+} */
 .btn-white{
+    cursor: pointer;
     background-color:rgb(254, 254, 254) ;    
     z-index: 1;
 }

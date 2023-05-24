@@ -59,7 +59,7 @@ layout= html.Div(children = [
 
             dbc.Row([
                 dbc.Col([
-                    dbc.Button("Submit", id ="submit_button" ),
+                    dbc.Button("Submit", id ="submit_button"),
                 ],className="d-grid")
             ])
         ])

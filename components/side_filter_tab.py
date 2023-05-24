@@ -1,7 +1,7 @@
 from dash import html, callback
 from dash.dependencies import Output,Input,State
 import dash_bootstrap_components as dbc 
-from callback_functions.home_page_functions import create_filter_buttons
+from callback_functions.home_page_functions import create_filter_buttons_figures_and_tables
 
 
 
