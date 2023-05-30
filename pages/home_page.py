@@ -14,5 +14,6 @@ from callback_functions.home_page_functions import *
 layout = html.Div(children=[
     navbar,
     side_filter_tab,
-    home_page_contents
+    home_page_contents,
+    dcc.Download("data_to_download")
 ],className="main-container")

@@ -1,8 +1,7 @@
-from dash import html, callback
+from dash import html, callback, dcc
 from dash.dependencies import Output,Input,State
 import dash_bootstrap_components as dbc 
 from callback_functions.home_page_functions import create_filter_buttons_figures_and_tables
-
 
 
 layout = html.Div([
@@ -29,7 +28,5 @@ layout = html.Div([
                 html.Div(id = "filters"),
             ],className="side-filter-tab-contents")
             ),
-        
-
     ]),
 ], id="side-filter-tab-container",className="side-filter-tab-container")

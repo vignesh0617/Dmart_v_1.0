@@ -1,5 +1,5 @@
 from dash.dependencies import Output, Input, State, MATCH, ALL
-from dash import Patch
+from dash import dcc
 from callback_functions.custom_helpers import main_app
 from dash.exceptions import PreventUpdate
 from connections.MySQL import *
@@ -56,7 +56,11 @@ def create_filter_buttons_figures_and_tables(n_clicks):
         data_frame = get_data_as_data_frame(sql_query=sql_1  , cursor= main_app.cursor)
         layout = html.Div([
             dbc.Label(column_label,className = "filter-label"),
-            dbc.Select(id = column_name , options=insert(data_frame[data_frame.columns[0]].unique(),0,'--None--'),value= '--None--',className = "filter-dropdown")
+            dcc.Dropdown(id = column_name , 
+                       options=data_frame[data_frame.columns[0]],
+                       className = "filter-dropdown",
+                       multi= True,
+                       placeholder= f"Select {column_label} ... ")
         ],className = "filter-card")
 
         filters.append(layout)
@@ -96,14 +100,23 @@ def create_filter_buttons_figures_and_tables(n_clicks):
     State({"type" : "run_table" , 'index' : ALL},"key"),   
     prevent_initial_call = True 
 )
-def test(n_clicks,key):
+def change_graph_and_table_data(n_clicks,key):
     trigger_id = ctx.triggered_id
 
+    print(trigger_id)
+    print(f'key ===== {key}')
     print(f"showing contents for selected Key = {key[trigger_id['index']]}")
 
     sql_query = f"select * from technical_reconciliation where Migration_Object_Name = '{key[trigger_id['index']]}'"
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
-    table = create_dash_table_from_data_frame(data_frame=data_frame,table_id="bottom_table",key_col_number=3)
+
+    #converting the RunID column to string data type:
+    data_frame["RunID"] = data_frame["RunID"].astype("string")
+    table = create_dash_table_from_data_frame(
+        data_frame=data_frame,table_id="bottom_table",
+        key_col_number=1,
+        primary_kel_column_numbers=[1,2],
+        action_col_numbers=[2,3,4])
 
     pie = px.pie(data_frame= data_frame.melt(id_vars=["RunID","Migration_Object_Name","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
                  names = "Success/Failre",
@@ -141,4 +154,31 @@ def test(n_clicks,key):
     
     return table,bar,pie
 
+@main_app.app.callback(
+    Output("data_to_download","data"),
+    Input({"type" : "bottom_table_row_data","index" :  ALL},"n_clicks"),
+    State({"type" : "bottom_table_row_data","index":ALL},"key"),
+    prevent_initial_call = True
+)
+def download_data(n_clicks,key):
+
+    #this trigerred id is used to access the correct nclicks and key value from the array of inputs
+    trigger_id = ctx.triggered_id
+
+    if(n_clicks[trigger_id['index']] is None):
+        raise PreventUpdate
+    
+    # print(f'n_clicks = {n_clicks}')
+    # print(f'key ===== {key}')
+    # print(f"ctx.triggered_id = {ctx.triggered_id}")
+    # print(f"ctx.triggered ===={ctx.triggered}")
+    # print(f"ctx.triggered_prop_ids ===={ctx.triggered_prop_ids}")
+    # print(f"ctx.states ===={ctx.states}")
+    # print(f"Key value for selected index is = {key[trigger_id['index']]}")
+
+    sample_content = f'''Downloading data column : {key[trigger_id['index']]['current_col_name']} 
+    ===================================================================== 
+    Primay keys used  : {key[trigger_id['index']]['primary_keys']}'''
+
+    return dict(content = sample_content,filename = "sample_download.txt")
 

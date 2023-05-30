@@ -49,7 +49,7 @@ def decode_token(token,
     return jwt.decode(token, secret_key, algorithm)
     
 #For creating a dash table from a dataframe and assign specific callback functions
-def create_dash_table_from_data_frame(data_frame,table_id,key_col_number):
+def create_dash_table_from_data_frame(data_frame,table_id,key_col_number,action_col_numbers = [],primary_kel_column_numbers = []):
     table_headings = []
     table_records = []
     no_of_rows = len(data_frame.index) 
@@ -62,6 +62,7 @@ def create_dash_table_from_data_frame(data_frame,table_id,key_col_number):
             )
         )
     
+    unique_id = 0
     for row in range(no_of_rows):
         records = []
         for col in range(no_of_cols):
@@ -69,12 +70,13 @@ def create_dash_table_from_data_frame(data_frame,table_id,key_col_number):
                 html.Td(
                     children = data_frame.iloc[row,col],
                     # id = f"{table_id}_row{row}_col{col}"
-                    id = {
-                        'type' : f"{table_id}_rowd_ata",
-                        'index' : f"{row}{col}"
-                    }
+                    id = {'type' : f"{table_id}_row_data",'index' : unique_id} if col in action_col_numbers else f"{table_id}_row_data" ,
+                    key = {"current_col_name" : data_frame.columns[col] , "primary_keys" : [{data_frame.columns[index-1] : data_frame.iloc[row,index-1] } for index in primary_kel_column_numbers ]},
+                    className = "table_action" if col in action_col_numbers else ""
                 )
             )
+            if col in action_col_numbers:
+                unique_id+=1
         table_records.append(
             html.Tr(
                 children = records,
