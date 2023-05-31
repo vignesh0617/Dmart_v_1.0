@@ -1,0 +1,63 @@
+.navbar-container{
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 10;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.74);
+}
+
+.navbar{
+    background-color: #000048;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.navbar , .navbar *{
+    font-size: 18px;
+    margin : 0;
+    padding : 0;
+}
+
+.navbar ul{
+    display: flex;
+    flex:1;
+    justify-content: space-between;
+}
+
+/* .navbar li{
+    text-decoration: none;
+    color : white;
+    list-style: none;
+    padding : 15px 20px;
+    margin: 0;
+} */
+
+.navbar a{
+    text-decoration: none;
+    color : white;
+    list-style: none;
+    padding : 15px 20px;
+    margin: 0;
+}
+
+.navbar a{
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar a.active-link::after{
+    content: "";
+    position: absolute;
+    left :0;
+    bottom: 0;
+    width: 100%;
+    border-bottom: 5px solid white;
+    border-radius: 2rem;
+}
+
+.navbar a:hover{
+    background-color: #000088cf;
+    cursor : pointer;
+}
+

@@ -17,21 +17,7 @@ layout= html.Div(children = [
                     dbc.Label(id="message")
                 ],className = "text-center fw-bold")
             ]),
-            dbc.Row([
-                dbc.Col([
-                    dbc.Label("Server" , className = "col-form-label"),                  
-                ],width=3),
-                dbc.Col([
-                    dbc.RadioItems(id = "server" ,
-                                    options=[
-                                      {"label" : "MySQL" , "value" : "MySQL"},
-                                      {"label" : "Oracel" , "value" : "Oracle", "disabled" : True},
-                                      {"label" : "PostgreSQL" , "value" : "PostgreSQL", "disabled" : True},
-                                  ],
-                                   inline = True, value="MySQL"
-                                  )
-                ],width=9)
-            ]),
+            
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Username", className="col-form-label")

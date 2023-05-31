@@ -33,8 +33,10 @@ def validate_token_and_update_screen(pathname,token):
         payload = decode_token(token)
         session_not_over = payload['session_end_time'] > int(time.time())
         if session_not_over:
+            main_app.current_url = pathname
             if(pathname == main_app.environment_details['home_page_link'] or pathname == main_app.environment_details['login_page_link']):
                 print("1.1--------------------")
+                print(f"=========> {main_app.current_url}")
                 return main_app.environment_details['home_page_link'],home_page,False
             elif(pathname == main_app.environment_details['logout_page_link']):
                 print("1.2--------------------")

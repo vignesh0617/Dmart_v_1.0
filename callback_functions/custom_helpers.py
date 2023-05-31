@@ -10,6 +10,7 @@ class reconciliation_app:
         self.connector = None
         self.cursor = None
         self.table1 = None
+        self.current_migration_object = None
         self.environment_details = {}
         self.assign_environment_details()
         

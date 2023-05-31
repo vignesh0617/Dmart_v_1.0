@@ -2,6 +2,7 @@ from dash import html, callback, dcc
 from dash.dependencies import Output,Input,State
 import dash_bootstrap_components as dbc 
 from callback_functions.home_page_functions import create_filter_buttons_figures_and_tables
+from callback_functions.side_filter_tab_functions import *
 
 
 layout = html.Div([

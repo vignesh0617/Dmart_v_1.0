@@ -28,10 +28,9 @@ def show_hide_password(n_clicks):
     Input("submit_button","n_clicks"),
     State("username","value"),
     State("password","value"),
-    State("server","value"),
     prevent_initial_call =True
     )
-def login_handler(n_clicks,username, password, server):
+def login_handler(n_clicks,username, password):
     
     if username != "" and password != "" and username is not None and password is not None: 
         main_app.connector,main_app.cursor, got_connection = get_connection(username = username , password = password)

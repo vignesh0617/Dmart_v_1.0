@@ -17,7 +17,7 @@ import plotly.express as px
     Input("show-hide-button","n_clicks"),
     State("show-hide-button","className"),
     prevent_initial_call=True)
-def toggle_buttons(n_clicks,class_name):
+def show_hide_filter_section(n_clicks,class_name):
     if(n_clicks%2==1):
         return class_name.replace("right","left"),"Hide Filters",{"left":"0px"},{"width":"70%","margin-left":"30%"}#{"width":"70%","margin-left":"30%"}
     else:
@@ -45,18 +45,21 @@ def create_filter_buttons_figures_and_tables(n_clicks):
     filter_tables = main_app.environment_details['filter_table_names'].split(',')
     filter_tables_columns = main_app.environment_details['filter_table_columns'].split(',')
     filter_tables_labels = main_app.environment_details['filter_table_labels'].split(',')
-    
+    filter_ids = main_app.environment_details['filter_ids'].split(',')
+
     filters = []
 
     for i in range(len(filter_tables)):
         table_name = filter_tables[i]
         column_name = filter_tables_columns[i]
         column_label = filter_tables_labels[i]
+        filter_id = filter_ids[i]
+        
         sql_1 = f"select distinct {column_name} from {table_name}"
         data_frame = get_data_as_data_frame(sql_query=sql_1  , cursor= main_app.cursor)
         layout = html.Div([
             dbc.Label(column_label,className = "filter-label"),
-            dcc.Dropdown(id = column_name , 
+            dcc.Dropdown(id = filter_id , 
                        options=data_frame[data_frame.columns[0]],
                        className = "filter-dropdown",
                        multi= True,
@@ -106,19 +109,21 @@ def change_graph_and_table_data(n_clicks,key):
     print(trigger_id)
     print(f'key ===== {key}')
     print(f"showing contents for selected Key = {key[trigger_id['index']]}")
+    main_app.current_migration_object = key[trigger_id['index']]
 
     sql_query = f"select * from technical_reconciliation where Migration_Object_Name = '{key[trigger_id['index']]}'"
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
 
-    #converting the RunID column to string data type:
-    data_frame["RunID"] = data_frame["RunID"].astype("string")
     table = create_dash_table_from_data_frame(
         data_frame=data_frame,table_id="bottom_table",
         key_col_number=1,
         primary_kel_column_numbers=[1,2],
         action_col_numbers=[2,3,4])
+    
+    #converting the RunID column to string data type:
+    data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-    pie = px.pie(data_frame= data_frame.melt(id_vars=["RunID","Migration_Object_Name","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+    pie = px.pie(data_frame= data_frame.loc[:,"RunID":"Selection_Failure"].melt(id_vars=["RunID","Migration_Object_Name","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
                  names = "Success/Failre",
                  values="Count",
                  height= 244,

@@ -1,6 +1,5 @@
-from dash import html
+from dash import html,dcc
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
 import plotly.express as px
 from connections.MySQL import get_data_as_data_frame
 # def hightlight_active_row(n_clicks,no_of_rows,no_of_cols):
