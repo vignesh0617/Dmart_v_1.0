@@ -9,20 +9,37 @@ from numpy import insert
 from callback_functions.custom_helpers import create_dash_table_from_data_frame
 import plotly.express as px
 
+# @main_app.app.callback(
+#     Output("show-hide-button","className"),
+#     Output("show-hide-popover","children"),
+#     Output("side-filter-tab-container","style"),
+#     Output("main-content-container","style"),
+#     Input("show-hide-button","n_clicks"),
+#     State("show-hide-button","className"),
+#     prevent_initial_call=True)
+# def show_hide_filter_section(n_clicks,class_name):
+#     if(n_clicks%2==1):
+#         return class_name.replace("right","left"),"Hide Filters",{"left":"0px"},{"width":"70%","margin-left":"30%"}#{"width":"70%","margin-left":"30%"}
+#     else:
+#         return class_name.replace("left","right"),"Show Filters",{},{}
+
+
 @main_app.app.callback(
-    Output("show-hide-button","className"),
-    Output("show-hide-popover","children"),
     Output("side-filter-tab-container","style"),
     Output("main-content-container","style"),
+    Output("clear_filter_button","style"),
+    Output("apply_filter_button","style"),
+    Output("filters","style"),
+    Output("show-hide-button","style"),
     Input("show-hide-button","n_clicks"),
-    State("show-hide-button","className"),
     prevent_initial_call=True)
-def show_hide_filter_section(n_clicks,class_name):
+def show_hide_filter_section(n_clicks):
     if(n_clicks%2==1):
-        return class_name.replace("right","left"),"Hide Filters",{"left":"0px"},{"width":"70%","margin-left":"30%"}#{"width":"70%","margin-left":"30%"}
+        return {"flex-basis":"20%"},{"flex-basis":"80%"},{"opacity":"1"},{"opacity":"1"},{"opacity":"1"},{"color":"green"}
     else:
-        return class_name.replace("left","right"),"Show Filters",{},{}
-    
+        return {},{},{},{},{},{}
+
+
 @main_app.app.callback(
     Output("main-content-container","children"),
     Input("execute_query","n_clicks"),

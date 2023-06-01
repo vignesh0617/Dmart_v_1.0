@@ -5,19 +5,6 @@ from dash.dependencies import Output , Input, State
 from callback_functions.custom_helpers import decode_token
 import time
 
-
-# navbar = html.Div([dbc.NavbarSimple(
-#     children=[
-#         dbc.NavItem(dbc.NavLink("About",href = main_app.environment_details['about_page_link'],active="exact")),
-#         dbc.NavItem(dbc.NavLink("Home",href = main_app.environment_details['home_page_link'],active="exact")),
-#         dbc.NavItem(dbc.NavLink("Logout",href = main_app.environment_details['logout_page_link'],active="exact")),
-#     ],
-#     brand="Dmart",
-#     brand_href="#",
-#     color="primary",
-#     dark="dark"
-# )], className="navbar")
-
 navbar = html.Div([
     html.Nav([
         html.Ul([
@@ -48,5 +35,3 @@ def highlight_active_link_and_toggle_logout_link(pathname,token):
         return "",{"display" : "none"}
     except Exception as e :
         return "",{"display" : "none"}
-
-    

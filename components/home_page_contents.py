@@ -16,6 +16,17 @@ layout = html.Div([
     #         body=True,
     #         trigger="hover",
     #     ),
+
+    # dbc.Button(
+    #         className="circle bi bi-arrow-right-circle-fill arrow-position",
+    #         id="show-hide-button"),
+    # dbc.Popover(
+    #         children=["Show Filters"],
+    #         id="show-hide-popover",
+    #         target="show-hide-button",
+    #         body=True,
+    #         trigger="hover",
+    #     ),
     
     html.Span(id="refresh_button", className="bi bi-arrow-clockwise refresh_button_position btn-white circle btn-animated"),
     dbc.Popover(

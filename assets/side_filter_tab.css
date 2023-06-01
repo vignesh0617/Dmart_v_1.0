@@ -1,5 +1,5 @@
 .side-filter-tab-container{
-    position:fixed;
+    /* position:fixed;
     left:calc(-1*(30% - 30px));
     top:56px;
     height: 100%;
@@ -9,54 +9,142 @@
     z-index: 5;
     padding: 20px 13px;
     background-color: #e1e1f2;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease; */
+
+    /* position: sticky;
+    top : 67px;
+    height: 87vh;
+    font-size: 12px;
+    flex-basis: 20%;
+    margin:10px 5px;
+    margin-left: 10px;
+    padding : 10px 0px;
+    box-shadow: var(--box-shadow);
+    border-radius: 6px; */
+
+    position: sticky;
+    top : 67px;
+    height: 87vh;
+    font-size: 12px;
+    margin:10px 5px;
+    margin-left: 10px;
+    padding : 10px 0px;
+    box-shadow: var(--box-shadow);
+    border-radius: 6px;
+
+    overflow-x: hidden;
+    flex-basis: 3.5%;
+    transition: var(--transition);
+
+    display: flex;
+    flex-direction: column;
 }
 
+
+.filter-header *:not(:first-child),
 .side-filter-tab-contents{
-    height: 80vh;
-    overflow:auto;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.side-filter-tab-container:hover  *
+{
+    opacity: 1;
+}
+
+.side-filter-tab-container:hover + .main-content
+{
+    flex-basis: 80%;
+    font-size: 15px;
+}
+
+.side-filter-tab-container:hover{
+    flex-basis: 20%;
+}
+
+
+.side-filter-tab-contents{
+    /* height: 80vh;
+    overflow:auto; */
+    
+    /* height: 10vh; */
+    overflow-y: auto;
+
+    /* display: flex;
+    flex-direction: column;
+    flex : 1; */
+}
+
+.side-filter-tab-contents:hover::-webkit-scrollbar{
+    width: 4px;
+    margin: none;
+}
+
+.side-filter-tab-contents:hover::-webkit-scrollbar-thumb{
+    background-color: #00000069;
+}
+
+.side-filter-tab-contents:hover::-webkit-scrollbar-track{
+    background-color: #ffffff;
 }
 
 .side-filter-tab-contents::-webkit-scrollbar{
     width: 4px;
     margin: none;
+    opacity: 0;
 }
 
 .side-filter-tab-contents::-webkit-scrollbar-thumb{
-    background-color: #b3b3f4;
+    background-color: transparent
 }
 
 .side-filter-tab-contents::-webkit-scrollbar-track{
-    background-color: #d0d0f3;
+    background-color: transparent
 }
 
-.arrow-position{
+
+/* .arrow-position{
     position: absolute;
-    right: 0;
+    top : 50px;
+    right : -3px;
     transform: translate(50%,0%);
-}
+    z-index: 20;
+    opacity: 1;
+} */
 
-.main-filter-label{
-    font-size: larger;
+.filter-icon{
+    margin-right: auto;
+    font-size: 15px;
+    color: #000048d2;
+    transform: scale(1.5);
+    cursor: pointer;
+    
+
 }
 
 .filter-card{
+
+    font-size: 10px;
     background-color: #ffffffed;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.568);
     padding: 20px;
     margin :20px auto;
     width: 90%;
+    flex-basis: 100%;
     
 }
 
 .filter-label {
     color : rgb(0, 0, 0);
+    font-size: 14px;
+
 }
 
 .filter-header{
     margin:9px 15px ;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    /* justify-content: space-between; */
     
 }
 
