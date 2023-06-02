@@ -1,6 +1,5 @@
 from callback_functions.custom_helpers import main_app,decode_token
 from dash.dependencies import Output, Input, State
-from pages.about_page import layout as about_page
 from pages.home_page import layout as home_page
 from pages.login_page import layout as login_page
 from pages.page_not_found import layout as page_not_found
@@ -34,11 +33,11 @@ def validate_token_and_update_screen(pathname,token):
         payload = decode_token(token)
         session_not_over = payload['session_end_time'] > int(time.time())
         if session_not_over:
+            main_app.current_url = pathname
             if(pathname == main_app.environment_details['home_page_link'] or pathname == main_app.environment_details['login_page_link']):
                 print("1.1--------------------")
+                print(f"=========> {main_app.current_url}")
                 return main_app.environment_details['home_page_link'],home_page,False
-            elif (pathname == main_app.environment_details['about_page_link']):
-                return pathname, about_page, False
             elif(pathname == main_app.environment_details['logout_page_link']):
                 print("1.2--------------------")
                 main_app.connector = ""

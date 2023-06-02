@@ -1,20 +1,20 @@
-# import ctypes
+
 import jwt
 import dash_bootstrap_components as dbc
 from dash import html, Dash
+
+#class for creating the reconciliation app
 class reconciliation_app:
     def __init__(self):
         self.app = Dash(name = "__main__",external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.BOOTSTRAP])
         self.connector = None
         self.cursor = None
-        self.year_filter = ""
-        self.continent_filter = ""
-        self.label = ""
-        self.value = ""
+        self.table1 = None
+        self.current_migration_object = None
         self.environment_details = {}
         self.assign_environment_details()
         
-    
+    #used to read the environment.txt file and assign the values to reconciliation_app
     def assign_environment_details(self):
         file = open("environment.txt","r")
         for line in file:
@@ -37,14 +37,67 @@ class reconciliation_app:
 
 main_app = reconciliation_app()
 
+#for creating JWT
 def create_token(payload, 
                 secret_key = main_app.environment_details['secret_key'], 
                 algorithm = main_app.environment_details['algorithm']):
     return jwt.encode(payload, secret_key, algorithm)
 
+#for decoding JWT
 def decode_token(token, 
                 secret_key = main_app.environment_details['secret_key'], 
                 algorithm = main_app.environment_details['algorithm']):
     return jwt.decode(token, secret_key, algorithm)
     
+#For creating a dash table from a dataframe and assign specific callback functions
+def create_dash_table_from_data_frame(data_frame,table_id,key_col_number,action_col_numbers = [],primary_kel_column_numbers = []):
+    table_headings = []
+    table_records = []
+    no_of_rows = len(data_frame.index) 
+    no_of_cols = len(data_frame.columns)
 
+    for col_label in data_frame.columns:
+        table_headings.append(
+            html.Th(
+                children = col_label.title()
+            )
+        )
+    
+    unique_id = 0
+    for row in range(no_of_rows):
+        records = []
+        for col in range(no_of_cols):
+            records.append(
+                html.Td(
+                    children = data_frame.iloc[row,col],
+                    # id = f"{table_id}_row{row}_col{col}"
+                    id = {'type' : f"{table_id}_row_data",'index' : unique_id} if col in action_col_numbers else f"{table_id}_row_data" ,
+                    key = {"current_col_name" : data_frame.columns[col] , "primary_keys" : [{data_frame.columns[index-1] : data_frame.iloc[row,index-1] } for index in primary_kel_column_numbers ]},
+                    className = "table_action" if col in action_col_numbers else ""
+                )
+            )
+            if col in action_col_numbers:
+                unique_id+=1
+        table_records.append(
+            html.Tr(
+                children = records,
+                id = {
+                    'type' : f"{table_id}",
+                    'index' : row
+                },
+                # id = f"{table_id}_row{row}",
+                key = data_frame.iloc[row,key_col_number]
+            )
+        )
+    final_table = html.Table([
+        html.Thead(
+            html.Tr(
+                table_headings
+            )
+        ),
+        html.Tbody(
+            table_records
+        )
+    ],id = table_id ,className="table table-hover table-light")
+
+    return final_table
