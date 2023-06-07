@@ -4,11 +4,12 @@ from callback_functions.custom_helpers import main_app,create_dash_table_from_da
 import pandas as pd
 import plotly.express as px
 from connections.MySQL import get_data_as_data_frame
+from dash.exceptions import PreventUpdate
 
 
 #this function will apply the filter values to technical recon view and show the output in dashboard home page
 @main_app.app.callback(
-    Output("home_page_contents_bottom", "children",allow_duplicate=True),
+    Output("bottom_table", "children",allow_duplicate=True),
     Output("fig_1", "figure",allow_duplicate=True),
     Output("fig_2", "figure",allow_duplicate=True),
     Input("apply_filter_button","n_clicks"),
@@ -43,7 +44,7 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,*filter_values
             data_frame=data_frame,table_id="bottom_table",
             key_col_number=1,
             primary_kel_column_numbers=[1,2],
-            action_col_numbers=[2,3,4])
+            action_col_numbers=[4])
         
         data_frame["RunID"] = data_frame["RunID"].astype("string")
 
@@ -86,9 +87,83 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,*filter_values
     return table,bar,pie
 
 @main_app.app.callback(
+    # [Output(filter_id+"_select_all","value") for filter_id in main_app.environment_details["filter_ids"].split(",")],
     [Output(filter_id,"value") for filter_id in main_app.environment_details["filter_ids"].split(",")],
     Input("clear_filter_button","n_clicks"),
     prevent_initial_call=True
 )
-def clear_all_filters(n_clicsk):
+def clear_all_filters(n_clicks):
     return [[] for filter_id in main_app.environment_details["filter_ids"].split(",")]
+
+
+
+
+#The below loop is used to update the labels of each filter passed
+filter_ids = main_app.environment_details['filter_ids'].split(',')
+
+for i in range(len(filter_ids)):
+    filter_id = filter_ids[i]
+    #trying to implement a new feature
+    @main_app.app.callback(
+        Output(filter_id+"_drop_down","label"),
+        Output(filter_id+"_select_all","value"),
+        Input(filter_id,"value"),
+        State(filter_id,"options"),
+        # prevent_initial_call='initial_duplicate',
+        # State(filter_id+"_select_all","value"),
+    )
+    def update_filter_label_and_options(value,options):
+
+        if(len(value)==len(options)):
+            return "All",True
+        return str([item for item in value]).replace("[","").replace("]","").replace("'","") if len(value) !=0 else "None", None
+
+    @main_app.app.callback(
+        Output(filter_id+"_drop_down","label",allow_duplicate=True),
+        Output(filter_id,"value",allow_duplicate=True),
+        Input(filter_id+"_select_all","value"),
+        State(filter_id,"options"),
+        prevent_initial_call='initial_duplicate',
+    )
+    def update_filter_label_and_options(selected,options):
+            if selected == None :
+                raise PreventUpdate
+            if selected :
+                return "All",[item for item in options]
+            else :
+                return "None",[]
+
+
+#trying to implement a new feature
+# @main_app.app.callback(
+#     Output("migration_Object_f"+"_drop_down","label"),
+#     Output("migration_Object_f"+"_select_all","value"),
+#     Input("migration_Object_f","value"),
+#     State("migration_Object_f","options"),
+#     # prevent_initial_call='initial_duplicate',
+#     # State(filter_id+"_select_all","value"),
+# )
+# def update_filter_label_and_options(value,options):
+
+#     if(len(value)==len(options)):
+#         return "All",True
+#     return str([item for item in value]).replace("[","").replace("]","").replace("'","") if len(value) !=0 else "None", None
+
+# @main_app.app.callback(
+#     Output("migration_Object_f"+"_drop_down","label",allow_duplicate=True),
+#     Output("migration_Object_f","value",allow_duplicate=True),
+#     Input("migration_Object_f"+"_select_all","value"),
+#     State("migration_Object_f","options"),
+#     prevent_initial_call='initial_duplicate',
+# )
+# def update_filter_label_and_options(selected,options):
+    
+#     if selected == None :
+#         raise PreventUpdate
+#     if selected :
+#         return "All",[item for item in options]
+#     else :
+#         return "None",[]
+
+
+

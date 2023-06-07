@@ -1,10 +1,9 @@
 from dash.dependencies import Output, Input, State, MATCH, ALL
-from dash import dcc
 from callback_functions.custom_helpers import main_app
 from dash.exceptions import PreventUpdate
 from connections.MySQL import *
 import dash_bootstrap_components as dbc
-from dash import dash_table, html, ctx
+from dash import dash_table, html, ctx,dcc
 from numpy import insert
 from callback_functions.custom_helpers import create_dash_table_from_data_frame
 import plotly.express as px
@@ -74,15 +73,24 @@ def create_filter_buttons_figures_and_tables(n_clicks):
         
         sql_1 = f"select distinct {column_name} from {table_name}"
         data_frame = get_data_as_data_frame(sql_query=sql_1  , cursor= main_app.cursor)
+        # layout = html.Div([
+        #     dbc.Label(column_label,className = "filter-label"),
+        #     dcc.Dropdown(id = filter_id , 
+        #                options=data_frame[data_frame.columns[0]],
+        #                className = "filter-dropdown",
+        #                multi= True,
+        #                placeholder= f"Select {column_label} ... ")
+        # ],className = "filter-card")
         layout = html.Div([
-            dbc.Label(column_label,className = "filter-label"),
-            dcc.Dropdown(id = filter_id , 
-                       options=data_frame[data_frame.columns[0]],
-                       className = "filter-dropdown",
-                       multi= True,
-                       placeholder= f"Select {column_label} ... ")
-        ],className = "filter-card")
-
+                    dbc.Label(column_label,className = "filter-label"),
+                    dbc.DropdownMenu([
+                        dbc.Checkbox(id=filter_id+"_select_all",label="Select All"),
+                        dbc.Checklist(id=filter_id,
+                                      options=data_frame[data_frame.columns[0]],
+                                      value=data_frame[data_frame.columns[0]])
+                    ],label = "All",id=filter_id+"_drop_down",toggleClassName ="something")
+                ],className = "filter-card")
+        
         filters.append(layout)
 
     sql_2 = "select Max(RunID) as 'RunID', Migration_Object_Name from technical_reconciliation group by Migration_Object_Name"
@@ -113,9 +121,10 @@ def create_filter_buttons_figures_and_tables(n_clicks):
 #     return "table-active"#,main_app.table1
 
 @main_app.app.callback(
-    Output("home_page_contents_bottom", "children"),
+    Output("bottom_table", "children"),
     Output("fig_1", "figure"),
     Output("fig_2", "figure"),
+    Output("loading_screen","style"),
     Input({"type" : "run_table" , "index" : ALL },"n_clicks"),
     State({"type" : "run_table" , 'index' : ALL},"key"),   
     prevent_initial_call = True 
@@ -135,7 +144,7 @@ def change_graph_and_table_data(n_clicks,key):
         data_frame=data_frame,table_id="bottom_table",
         key_col_number=1,
         primary_kel_column_numbers=[1,2],
-        action_col_numbers=[2,3,4])
+        action_col_numbers=[4])
     
     #converting the RunID column to string data type:
     data_frame["RunID"] = data_frame["RunID"].astype("string")
@@ -174,15 +183,48 @@ def change_graph_and_table_data(n_clicks,key):
     x=1
     ))
     
-    return table,bar,pie
+    return table,bar,pie,{"display":"none"}
+
+# for now commenting this download feature. The details will be updated later
+
+# @main_app.app.callback(
+#     Output("data_to_download","data"),
+#     Input({"type" : "bottom_table_row_data","index" :  ALL},"n_clicks"),
+#     State({"type" : "bottom_table_row_data","index":ALL},"key"),
+#     prevent_initial_call = True
+# )
+# def download_data(n_clicks,key):
+
+#     #this trigerred id is used to access the correct nclicks and key value from the array of inputs
+#     trigger_id = ctx.triggered_id
+
+#     if(n_clicks[trigger_id['index']] is None):
+#         raise PreventUpdate
+    
+#     # print(f'n_clicks = {n_clicks}')
+#     # print(f'key ===== {key}')
+#     # print(f"ctx.triggered_id = {ctx.triggered_id}")
+#     # print(f"ctx.triggered ===={ctx.triggered}")
+#     # print(f"ctx.triggered_prop_ids ===={ctx.triggered_prop_ids}")
+#     # print(f"ctx.states ===={ctx.states}")
+#     # print(f"Key value for selected index is = {key[trigger_id['index']]}")
+
+#     sample_content = f'''Downloading data column : {key[trigger_id['index']]['current_col_name']} 
+#     ===================================================================== 
+#     Primay keys used  : {key[trigger_id['index']]['primary_keys']}'''
+
+#     return dict(content = sample_content,filename = "sample_download.txt")
+
 
 @main_app.app.callback(
-    Output("data_to_download","data"),
+    Output("bottom_table_failed_records","children"),
+    Output("bottom_table_failed_records","style"),
+    Output("bottom_table","style"),
     Input({"type" : "bottom_table_row_data","index" :  ALL},"n_clicks"),
     State({"type" : "bottom_table_row_data","index":ALL},"key"),
     prevent_initial_call = True
 )
-def download_data(n_clicks,key):
+def show_failed_records(n_clicks,key):
 
     #this trigerred id is used to access the correct nclicks and key value from the array of inputs
     trigger_id = ctx.triggered_id
@@ -190,17 +232,32 @@ def download_data(n_clicks,key):
     if(n_clicks[trigger_id['index']] is None):
         raise PreventUpdate
     
-    # print(f'n_clicks = {n_clicks}')
-    # print(f'key ===== {key}')
-    # print(f"ctx.triggered_id = {ctx.triggered_id}")
-    # print(f"ctx.triggered ===={ctx.triggered}")
-    # print(f"ctx.triggered_prop_ids ===={ctx.triggered_prop_ids}")
-    # print(f"ctx.states ===={ctx.states}")
-    # print(f"Key value for selected index is = {key[trigger_id['index']]}")
-
     sample_content = f'''Downloading data column : {key[trigger_id['index']]['current_col_name']} 
-    ===================================================================== 
+    =====================================================================\n 
     Primay keys used  : {key[trigger_id['index']]['primary_keys']}'''
 
-    return dict(content = sample_content,filename = "sample_download.txt")
+    layout = html.Div([
+        html.Div([
+            html.Button(className="bi bi-arrow-left-circle",id="failed_records_header_back_button"),
+            "Download Enabled" if True else "Download disabled",
+        ],className="failed-records-header"),
+        html.Div([
+            sample_content
+        ],id="failed_records_contents")
+    ],className="failed-records-container")
+
+    return layout,{"display" : "block"},{"display" : "none"}
+
+@main_app.app.callback(
+    Output("bottom_table_failed_records","style",allow_duplicate=True),
+    Output("bottom_table","style",allow_duplicate=True),
+    Input("failed_records_header_back_button","n_clicks"),
+    prevent_initial_call = True,
+)
+def change_style(n_clicks):
+    if (n_clicks is None):
+        raise PreventUpdate
+    return {"display" : "none"},{"display" : "block"}
+
+
 

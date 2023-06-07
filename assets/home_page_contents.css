@@ -11,7 +11,9 @@
     background-color: #cecefa;
     transition: all 0.3s ease; */
 
-    flex-basis: 97.50%;
+    /* flex-basis: 97.50%; */
+    
+    flex-basis: 80%;
     overflow-x: hidden;
     position: relative;
     transition: var(--transition);
@@ -26,6 +28,7 @@
     box-shadow: var(--box-shadow);
 }
 
+
 .main-content *{
     font-size: inherit;
 }
@@ -33,23 +36,36 @@
 .main-container{
     position: relative;
     display: flex;
-    flex :1;
     margin-top : 57px;
+
+    /* background-image: linear-gradient(to top,rgb(215, 236, 244),rgb(197, 203, 244)); */
+    
+    background-image: linear-gradient(to top,rgb(219, 215, 244),rgb(238, 239, 246));
+}
+
+.main-container>*{
+    background-color: white;
 }
 
 
-.main-content::-webkit-scrollbar{
+html *::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+.home-page-contents-bottom::-webkit-scrollbar{
     width: 4px;
     height: 4px;
     margin: none;
 }
 
-.main-content::-webkit-scrollbar-thumb{
+html *::-webkit-scrollbar,
+.main-content::-webkit-scrollbar-thumb,
+.home-page-contents-bottom::-webkit-scrollbar-thumb{
     background-color: #00000069;
     border-radius: 100px;
 }
 
-.main-content::-webkit-scrollbar-track{
+html *::-webkit-scrollbar,
+.main-content::-webkit-scrollbar-track,
+.home-page-contents-bottom::-webkit-scrollbar-track{
     background-color: transparent;
     opacity: 0;
 }
@@ -101,6 +117,7 @@
 }
 
 .top-figures{
+    position: relative;
     display: flex;
     flex: 1;
     justify-content: space-between;
@@ -124,4 +141,44 @@ table td.table_action:hover{
     transform: translate(-50%,0%);
     z-index: 20;
     opacity: 1;
+}
+
+.applied_filters{
+    position: sticky;
+    top : 10px;
+    background-color: #fff;
+    z-index: 5;
+}
+
+
+.home-page-contents-bottom{
+    position: relative;
+    height : 235px;
+    overflow: auto;
+}
+
+.home-page-contents-bottom table th{
+    position: sticky;
+    top : 0;
+}
+
+.bottom-table-failed-records{
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+}
+
+.loading-screen{
+    position: absolute;
+    top :0;
+    left: 0;
+    bottom: 0;
+    right:0;
+    background-color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }

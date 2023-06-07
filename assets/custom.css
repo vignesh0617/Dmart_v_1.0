@@ -95,6 +95,7 @@ html, body {
 .btn-white{
     background-color:rgb(254, 254, 254) ;    
     z-index: 1;
+    border: 1.3px solid black;
 }
 
 .btn-light{
@@ -119,8 +120,8 @@ html, body {
     position: absolute;
     content: "";
     display: inline-block;
-    background-color: #0000483b;
-    /* background-color: rgb(254, 254, 254); */
+    /* background-color: #0000483b; */
+    background-color: rgb(254, 254, 254);
     transition: all 0.3s ease;
     z-index: -1;
     left: 0;
