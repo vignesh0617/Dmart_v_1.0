@@ -12,6 +12,8 @@ from dash.exceptions import PreventUpdate
     Output("bottom_table", "children",allow_duplicate=True),
     Output("fig_1", "figure",allow_duplicate=True),
     Output("fig_2", "figure",allow_duplicate=True),
+    Output("bottom_table_failed_records","style",allow_duplicate=True),
+    Output("bottom_table","style",allow_duplicate=True),
     Input("apply_filter_button","n_clicks"),
     [State(filter_id,"value") for filter_id in main_app.environment_details['filter_ids'].split(',')],
     prevent_initial_call = True 
@@ -84,7 +86,8 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,*filter_values
     else :
         table = "No contents found for the applied filter"
     
-    return table,bar,pie
+    print("-------------------Filter Applied-----------------")
+    return table,bar,pie,{"display":"none"},{}
 
 @main_app.app.callback(
     # [Output(filter_id+"_select_all","value") for filter_id in main_app.environment_details["filter_ids"].split(",")],

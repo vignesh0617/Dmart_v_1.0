@@ -71,8 +71,8 @@ def create_dash_table_from_data_frame(data_frame,table_id,key_col_number,action_
                 html.Td(
                     children = data_frame.iloc[row,col],
                     # id = f"{table_id}_row{row}_col{col}"
-                    id = {'type' : f"{table_id}_row_data",'index' : unique_id} if col in action_col_numbers else f"{table_id}_row_data" ,
-                    key = {"current_col_name" : data_frame.columns[col] , "primary_keys" : [{data_frame.columns[index-1] : data_frame.iloc[row,index-1] } for index in primary_kel_column_numbers ]},
+                    id = {'type' : f"{table_id}_row_data",'index' : unique_id} if col in action_col_numbers else f"{table_id}_row_data_row-{row}_col-{col}" ,
+                    key = {"column_name" : data_frame.columns[col],"column_data" : data_frame.iloc[row,col] , "primary_keys" : [{data_frame.columns[index-1] : data_frame.iloc[row,index-1] } for index in primary_kel_column_numbers ]} if col in action_col_numbers else {"column_name" : data_frame.columns[col],"column_data" : data_frame.iloc[row,col] },
                     className = "table_action" if col in action_col_numbers else ""
                 )
             )

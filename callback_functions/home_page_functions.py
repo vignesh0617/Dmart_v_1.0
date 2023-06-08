@@ -7,6 +7,7 @@ from dash import dash_table, html, ctx,dcc
 from numpy import insert
 from callback_functions.custom_helpers import create_dash_table_from_data_frame
 import plotly.express as px
+import pandas as pd
 
 # @main_app.app.callback(
 #     Output("show-hide-button","className"),
@@ -57,7 +58,9 @@ def get_table_data(n_clicks,sql_query):
         Output("top_table","children"),
         Input("refresh_button","n_clicks"),
 )
-def create_filter_buttons_figures_and_tables(n_clicks):
+def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks):
+
+
     filter_tables = main_app.environment_details['filter_table_names'].split(',')
     filter_tables_columns = main_app.environment_details['filter_table_columns'].split(',')
     filter_tables_labels = main_app.environment_details['filter_table_labels'].split(',')
@@ -99,6 +102,8 @@ def create_filter_buttons_figures_and_tables(n_clicks):
 
     top_table = create_dash_table_from_data_frame(data_frame=data_frame, table_id = "run_table" , key_col_number= 1)
     
+    
+    print(f"-------------------Once again refreshed Applied click count = {n_clicks} ctx = {ctx.triggered_id} - {ctx.triggered_prop_ids}-----------------")
     return filters,top_table
 
 
@@ -125,6 +130,8 @@ def create_filter_buttons_figures_and_tables(n_clicks):
     Output("fig_1", "figure"),
     Output("fig_2", "figure"),
     Output("loading_screen","style"),
+    Output("bottom_table_failed_records","style",allow_duplicate=True),
+    Output("bottom_table","style",allow_duplicate=True),
     Input({"type" : "run_table" , "index" : ALL },"n_clicks"),
     State({"type" : "run_table" , 'index' : ALL},"key"),   
     prevent_initial_call = True 
@@ -183,7 +190,7 @@ def change_graph_and_table_data(n_clicks,key):
     x=1
     ))
     
-    return table,bar,pie,{"display":"none"}
+    return table,bar,pie,{"display":"none"},{"display" : "none"},{}
 
 # for now commenting this download feature. The details will be updated later
 
@@ -218,8 +225,8 @@ def change_graph_and_table_data(n_clicks,key):
 
 @main_app.app.callback(
     Output("bottom_table_failed_records","children"),
-    Output("bottom_table_failed_records","style"),
-    Output("bottom_table","style"),
+    Output("bottom_table_failed_records","style",allow_duplicate=True),
+    Output("bottom_table","style",allow_duplicate=True),
     Input({"type" : "bottom_table_row_data","index" :  ALL},"n_clicks"),
     State({"type" : "bottom_table_row_data","index":ALL},"key"),
     prevent_initial_call = True
@@ -232,21 +239,33 @@ def show_failed_records(n_clicks,key):
     if(n_clicks[trigger_id['index']] is None):
         raise PreventUpdate
     
-    sample_content = f'''Downloading data column : {key[trigger_id['index']]['current_col_name']} 
-    =====================================================================\n 
-    Primay keys used  : {key[trigger_id['index']]['primary_keys']}'''
+    keys = f"Downloading failed data for : {key[trigger_id['index']]['primary_keys']}"
+    no_of_failed_records = int(key[trigger_id['index']]['column_data'])
+
+    print(f"\n\n\n\n\n\{no_of_failed_records}\n\n\n\n\n\n\n")
+    sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
+    data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
+    failed_records = create_dash_table_from_data_frame(
+                        data_frame=data_frame,
+                        table_id="failed_records",
+                        key_col_number= 1,
+                        )
 
     layout = html.Div([
         html.Div([
-            html.Button(className="bi bi-arrow-left-circle",id="failed_records_header_back_button"),
-            "Download Enabled" if True else "Download disabled",
+            html.Button(id="failed_records_header_back_button",className="bi bi-arrow-left-circle back-button btn-theme1"),
+            dbc.DropdownMenu(children=[
+                dbc.DropdownMenuItem("Excel",id="download_data_excel")
+            ],
+            disabled= True if no_of_failed_records == 0 else False,
+            className="demo_class"),
         ],className="failed-records-header"),
         html.Div([
-            sample_content
+            failed_records
         ],id="failed_records_contents")
     ],className="failed-records-container")
 
-    return layout,{"display" : "block"},{"display" : "none"}
+    return layout,{},{"display" : "none"}
 
 @main_app.app.callback(
     Output("bottom_table_failed_records","style",allow_duplicate=True),
@@ -254,10 +273,34 @@ def show_failed_records(n_clicks,key):
     Input("failed_records_header_back_button","n_clicks"),
     prevent_initial_call = True,
 )
-def change_style(n_clicks):
+def  show_and_hide_failed_records(n_clicks):
     if (n_clicks is None):
         raise PreventUpdate
-    return {"display" : "none"},{"display" : "block"}
+    return {"display" : "none"},{}
 
+
+#Function for downloading Excel files
+@main_app.app.callback(
+    Output("data_to_download","data"),
+    Input("download_data_excel","n_clicks"),
+    prevent_initial_call = True
+)
+def download_data(n_clicks):
+
+    if(n_clicks is None):
+        raise PreventUpdate
+    
+    sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
+    data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
+  
+    # print(f'n_clicks = {n_clicks}')
+    # print(f'key ===== {key}')
+    # print(f"ctx.triggered_id = {ctx.triggered_id}")
+    # print(f"ctx.triggered ===={ctx.triggered}")
+    # print(f"ctx.triggered_prop_ids ===={ctx.triggered_prop_ids}")
+    # print(f"ctx.states ===={ctx.states}")
+    # print(f"Key value for selected index is = {key[trigger_id['index']]}")
+
+    return dcc.send_data_frame(data_frame.to_excel, "sample_download.xlsx", sheet_name="Failed_Data")
 
 

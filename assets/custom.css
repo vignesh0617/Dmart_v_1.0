@@ -74,7 +74,7 @@ html, body {
     border-radius: 2px;
     background-color: #000048d2;
     color: white;
-    transition: all .3s ease;
+    /* transition: all .3s ease; */
 }
 
 .btn-theme1:hover{

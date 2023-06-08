@@ -182,3 +182,35 @@ table td.table_action:hover{
     align-items: center;
     flex-direction: column;
 }
+
+.bottom-table-failed-records{
+    width: 100%;
+}
+
+
+.failed-records-header{
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    position: sticky;
+    top : 0;
+    z-index: 10;
+}
+
+
+#failed_records thead tr th {
+    position: sticky;
+    top : 58.5px;
+    z-index: 0;
+    
+}
+
+.failed-records-header .dropdown .btn{
+    /* background-color: red; */
+}
+
+.failed-records-header .dropdown .dropdown-toggle::after{
+    content: "Download";
+    /* border: none; */
+}
