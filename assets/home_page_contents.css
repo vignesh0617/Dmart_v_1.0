@@ -205,12 +205,3 @@ table td.table_action:hover{
     z-index: 0;
     
 }
-
-.failed-records-header .dropdown .btn{
-    /* background-color: red; */
-}
-
-.failed-records-header .dropdown .dropdown-toggle::after{
-    content: "Download";
-    /* border: none; */
-}

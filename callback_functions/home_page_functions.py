@@ -57,14 +57,17 @@ def get_table_data(n_clicks,sql_query):
         Output("filters","children"),
         Output("top_table","children"),
         Input("refresh_button","n_clicks"),
+        State("filter_type","value")
+
 )
-def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks):
+def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_type_value):
 
 
     filter_tables = main_app.environment_details['filter_table_names'].split(',')
     filter_tables_columns = main_app.environment_details['filter_table_columns'].split(',')
     filter_tables_labels = main_app.environment_details['filter_table_labels'].split(',')
     filter_ids = main_app.environment_details['filter_ids'].split(',')
+    filter_types = main_app.environment_details['filter_types'].split(',')
 
     filters = []
 
@@ -73,6 +76,7 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks):
         column_name = filter_tables_columns[i]
         column_label = filter_tables_labels[i]
         filter_id = filter_ids[i]
+        filter_type = filter_types[i]
         
         sql_1 = f"select distinct {column_name} from {table_name}"
         data_frame = get_data_as_data_frame(sql_query=sql_1  , cursor= main_app.cursor)
@@ -91,8 +95,14 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks):
                         dbc.Checklist(id=filter_id,
                                       options=data_frame[data_frame.columns[0]],
                                       value=data_frame[data_frame.columns[0]])
-                    ],label = "All",id=filter_id+"_drop_down",toggleClassName ="something")
-                ],className = "filter-card")
+                    ],
+                    label = "All",
+                    id=filter_id+"_drop_down",
+                    disabled = False if filter_type == "common" or filter_type == filter_type_value else True,
+                    )
+                ],className = "filter-card",
+                  id = f"filter_card_{i}",
+                  style = {} if filter_type == "common" or filter_type == filter_type_value else {"display":"none"} )
         
         filters.append(layout)
 
@@ -102,10 +112,22 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks):
 
     top_table = create_dash_table_from_data_frame(data_frame=data_frame, table_id = "run_table" , key_col_number= 1)
     
-    
-    print(f"-------------------Once again refreshed Applied click count = {n_clicks} ctx = {ctx.triggered_id} - {ctx.triggered_prop_ids}-----------------")
     return filters,top_table
 
+
+@main_app.app.callback(
+        [Output(filter_id+"_drop_down" ,"disabled") for filter_id in main_app.environment_details['filter_ids'].split(',')],
+        [Output(f"filter_card_{index}","style") for index in range(len(main_app.environment_details['filter_ids'].split(',')))],
+        Input("filter_type","value")
+
+)
+def create_filter_buttons_figures_and_tables_and_refresh_data(filter_type_value):
+
+    filter_types = main_app.environment_details['filter_types'].split(',')
+    output = [False if flag == "common" or flag == filter_type_value else True for flag in filter_types]
+    output.extend([{} if flag == "common" or flag == filter_type_value else {"display":"none"} for flag in filter_types])
+
+    return output
 
 #may be the below code can be understood and used in future
 
@@ -241,8 +263,6 @@ def show_failed_records(n_clicks,key):
     
     keys = f"Downloading failed data for : {key[trigger_id['index']]['primary_keys']}"
     no_of_failed_records = int(key[trigger_id['index']]['column_data'])
-
-    print(f"\n\n\n\n\n\{no_of_failed_records}\n\n\n\n\n\n\n")
     sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
     failed_records = create_dash_table_from_data_frame(
@@ -253,12 +273,11 @@ def show_failed_records(n_clicks,key):
 
     layout = html.Div([
         html.Div([
-            html.Button(id="failed_records_header_back_button",className="bi bi-arrow-left-circle back-button btn-theme1"),
-            dbc.DropdownMenu(children=[
-                dbc.DropdownMenuItem("Excel",id="download_data_excel")
-            ],
-            disabled= True if no_of_failed_records == 0 else False,
-            className="demo_class"),
+            html.Button(id="failed_records_header_back_button",
+                        className="bi bi-arrow-left-circle btn-theme1"),
+            html.Button(id="download_data_excel", 
+                        className = f"bi bi-download btn-theme1 {'disabled' if no_of_failed_records == 0 else ''}",
+                        disabled= True if no_of_failed_records == 0 else False),
         ],className="failed-records-header"),
         html.Div([
             failed_records
@@ -293,14 +312,6 @@ def download_data(n_clicks):
     sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
   
-    # print(f'n_clicks = {n_clicks}')
-    # print(f'key ===== {key}')
-    # print(f"ctx.triggered_id = {ctx.triggered_id}")
-    # print(f"ctx.triggered ===={ctx.triggered}")
-    # print(f"ctx.triggered_prop_ids ===={ctx.triggered_prop_ids}")
-    # print(f"ctx.states ===={ctx.states}")
-    # print(f"Key value for selected index is = {key[trigger_id['index']]}")
-
     return dcc.send_data_frame(data_frame.to_excel, "sample_download.xlsx", sheet_name="Failed_Data")
 
 

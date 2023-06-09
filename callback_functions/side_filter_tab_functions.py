@@ -15,10 +15,11 @@ from dash.exceptions import PreventUpdate
     Output("bottom_table_failed_records","style",allow_duplicate=True),
     Output("bottom_table","style",allow_duplicate=True),
     Input("apply_filter_button","n_clicks"),
+    State("filter_type","value"),
     [State(filter_id,"value") for filter_id in main_app.environment_details['filter_ids'].split(',')],
     prevent_initial_call = True 
 )
-def change_table_and_graph_data_for_technical_recon_view(n_clicks,*filter_values):
+def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*filter_values):
 
     table = None
     pie = px.bar()
@@ -30,11 +31,15 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,*filter_values
 
     sql_query = f"select * from technical_reconciliation"
 
+    filter_types = main_app.environment_details['filter_types'].split(',')
+
+    index = 0
     for column_name,filter_value in dictionary.items():
         if(filter_value is not None):
-            if(len(filter_value)!=0):
+            if(len(filter_value)!=0 and (filter_type == "common" or filter_type == filter_types[index] )) :
                 sql_query+=f" {' and ' if sql_query.find('where')!=-1 else ' where '} {column_name} in {filter_value} "
-
+        index+=1
+        
     sql_query = sql_query.replace("[","(").replace("]",")")
 
     # print(f"SQL Query =========== \n\n\n\n{sql_query}\n\n\n\n")

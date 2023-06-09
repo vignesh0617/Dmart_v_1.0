@@ -143,3 +143,8 @@ html, body {
 .white{
     background-color: whitesmoke;
 }
+
+.disabled{
+    cursor : not-allowed;
+    display: none;
+}
