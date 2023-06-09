@@ -36,10 +36,10 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
     index = 0
     for column_name,filter_value in dictionary.items():
         if(filter_value is not None):
-            if(len(filter_value)!=0 and (filter_type == "common" or filter_type == filter_types[index] )) :
+            if(len(filter_value)!=0 and (filter_types[index] == "common" or  filter_types[index] == filter_type )) :
                 sql_query+=f" {' and ' if sql_query.find('where')!=-1 else ' where '} {column_name} in {filter_value} "
         index+=1
-        
+
     sql_query = sql_query.replace("[","(").replace("]",")")
 
     # print(f"SQL Query =========== \n\n\n\n{sql_query}\n\n\n\n")
@@ -92,6 +92,7 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
         table = "No contents found for the applied filter"
     
     print("-------------------Filter Applied-----------------")
+    print(sql_query)
     return table,bar,pie,{"display":"none"},{}
 
 @main_app.app.callback(
