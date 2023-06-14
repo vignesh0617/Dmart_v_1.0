@@ -122,12 +122,10 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
 
 )
 def create_filter_buttons_figures_and_tables_and_refresh_data(filter_type_value):
-
     filter_types = main_app.environment_details['filter_types'].split(',')
-    output = [False if flag == "common" or flag == filter_type_value else True for flag in filter_types]
-    output.extend([{} if flag == "common" or flag == filter_type_value else {"display":"none"} for flag in filter_types])
-
-    return output
+    output1 = [False if flag == "common" or flag == filter_type_value else True for flag in filter_types]
+    output2 = [{} if flag == "common" or flag == filter_type_value else {"display":"none"} for flag in filter_types]
+    return output1+output2
 
 #may be the below code can be understood and used in future
 
