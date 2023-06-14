@@ -106,7 +106,7 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
         
         filters.append(layout)
 
-    sql_2 = "select Max(RunID) as 'RunID', Migration_Object_Name from technical_reconciliation group by Migration_Object_Name"
+    sql_2 = "select RunID, `Rule Name` from technical_reconciliation"
     
     data_frame = get_data_as_data_frame(sql_query=sql_2,cursor=main_app.cursor)
 
@@ -162,21 +162,20 @@ def change_graph_and_table_data(n_clicks,key):
     print(trigger_id)
     print(f'key ===== {key}')
     print(f"showing contents for selected Key = {key[trigger_id['index']]}")
-    main_app.current_migration_object = key[trigger_id['index']]
 
-    sql_query = f"select * from technical_reconciliation where Migration_Object_Name = '{key[trigger_id['index']]}'"
+    sql_query = f'select * from technical_reconciliation where `Rule Name` = "{key[trigger_id["index"]]}"'
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
 
     table = create_dash_table_from_data_frame(
         data_frame=data_frame,table_id="bottom_table",
         key_col_number=1,
         primary_kel_column_numbers=[1,2],
-        action_col_numbers=[4])
+        action_col_numbers=[11])
     
     #converting the RunID column to string data type:
     data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-    pie = px.pie(data_frame= data_frame.loc[:,"RunID":"Selection_Failure"].melt(id_vars=["RunID","Migration_Object_Name","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+    pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Selection_Success','Selection_Failure']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
                  names = "Success/Failre",
                  values="Count",
                  height= 244,
@@ -267,6 +266,7 @@ def show_failed_records(n_clicks,key):
                         data_frame=data_frame,
                         table_id="failed_records",
                         key_col_number= 1,
+                        capital_headings=True
                         )
 
     layout = html.Div([

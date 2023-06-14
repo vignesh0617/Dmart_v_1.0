@@ -51,12 +51,12 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
             data_frame=data_frame,table_id="bottom_table",
             key_col_number=1,
             primary_kel_column_numbers=[1,2],
-            action_col_numbers=[4])
+            action_col_numbers=[11])
         
         data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-        pie = px.pie(data_frame= data_frame.loc[:,"RunID":"Selection_Failure"].melt(id_vars=["RunID","Migration_Object_Name","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
-                    names = "Success/Failre",
+        pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Selection_Success','Selection_Failure']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+                names = "Success/Failre",
                     values="Count",
                     height= 244,
                     width= 344,

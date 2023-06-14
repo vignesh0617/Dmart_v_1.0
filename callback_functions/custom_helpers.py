@@ -9,8 +9,6 @@ class reconciliation_app:
         self.app = Dash(name = "__main__",external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.BOOTSTRAP])
         self.connector = None
         self.cursor = None
-        self.table1 = None
-        self.current_migration_object = None
         self.environment_details = {}
         self.assign_environment_details()
         
@@ -50,7 +48,7 @@ def decode_token(token,
     return jwt.decode(token, secret_key, algorithm)
     
 #For creating a dash table from a dataframe and assign specific callback functions
-def create_dash_table_from_data_frame(data_frame,table_id,key_col_number,action_col_numbers = [],primary_kel_column_numbers = []):
+def create_dash_table_from_data_frame(data_frame,table_id,key_col_number,action_col_numbers = [],primary_kel_column_numbers = [],capital_headings=False):
     table_headings = []
     table_records = []
     no_of_rows = len(data_frame.index) 
@@ -59,7 +57,7 @@ def create_dash_table_from_data_frame(data_frame,table_id,key_col_number,action_
     for col_label in data_frame.columns:
         table_headings.append(
             html.Th(
-                children = col_label.title()
+                children = col_label.upper() if capital_headings else col_label.title()
             )
         )
     
