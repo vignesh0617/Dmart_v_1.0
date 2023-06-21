@@ -48,10 +48,11 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
 
     if(len(data_frame != 0)):
         table = create_dash_table_from_data_frame(
-            data_frame=data_frame,table_id="bottom_table",
+            data_frame_original=data_frame,table_id="bottom_table",
             key_col_number=1,
-            primary_kel_column_numbers=[1,2],
-            action_col_numbers=[11])
+            primary_kel_column_numbers=list(map(int,main_app.environment_details["bottom_table_primary_key_column_number"].split(","))),
+            action_col_numbers=[11],
+            col_numbers_to_omit=[12])
         
         data_frame["RunID"] = data_frame["RunID"].astype("string")
 
