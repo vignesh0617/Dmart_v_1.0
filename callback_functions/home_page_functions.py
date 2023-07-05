@@ -1,68 +1,60 @@
-from dash.dependencies import Output, Input, State, MATCH, ALL
+from dash.dependencies import Output, Input, State, ALL
 from callback_functions.custom_helpers import main_app
 from dash.exceptions import PreventUpdate
 from connections.MySQL import *
 import dash_bootstrap_components as dbc
-from dash import dash_table, html, ctx,dcc
+from dash import dash_table, html, ctx,dcc , no_update
 from numpy import insert
 from callback_functions.custom_helpers import create_dash_table_from_data_frame
 import plotly.express as px
 import pandas as pd
+from mysql.connector import errorcode, Error
+
+
+# Below function was created to toggle filter screen. Uncomment it if requried
 
 # @main_app.app.callback(
-#     Output("show-hide-button","className"),
-#     Output("show-hide-popover","children"),
 #     Output("side-filter-tab-container","style"),
 #     Output("main-content-container","style"),
+#     Output("clear_filter_button","style"),
+#     Output("apply_filter_button","style"),
+#     Output("filters","style"),
+#     Output("show-hide-button","style"),
 #     Input("show-hide-button","n_clicks"),
-#     State("show-hide-button","className"),
 #     prevent_initial_call=True)
-# def show_hide_filter_section(n_clicks,class_name):
+# def show_hide_filter_section(n_clicks):
 #     if(n_clicks%2==1):
-#         return class_name.replace("right","left"),"Hide Filters",{"left":"0px"},{"width":"70%","margin-left":"30%"}#{"width":"70%","margin-left":"30%"}
+#         return {"flex-basis":"20%"},{"flex-basis":"80%"},{"opacity":"1"},{"opacity":"1"},{"opacity":"1"},{"color":"green"}
 #     else:
-#         return class_name.replace("left","right"),"Show Filters",{},{}
+#         return {},{},{},{},{},{}
 
 
-@main_app.app.callback(
-    Output("side-filter-tab-container","style"),
-    Output("main-content-container","style"),
-    Output("clear_filter_button","style"),
-    Output("apply_filter_button","style"),
-    Output("filters","style"),
-    Output("show-hide-button","style"),
-    Input("show-hide-button","n_clicks"),
-    prevent_initial_call=True)
-def show_hide_filter_section(n_clicks):
-    if(n_clicks%2==1):
-        return {"flex-basis":"20%"},{"flex-basis":"80%"},{"opacity":"1"},{"opacity":"1"},{"opacity":"1"},{"color":"green"}
-    else:
-        return {},{},{},{},{},{}
+# below function is a additional functionality to query the backend tables directly. Uncomment it to add the feature
+# @main_app.app.callback(
+#     Output("main-content-container","children"),
+#     Input("execute_query","n_clicks"),
+#     State("query","value")
+# )
+# def get_table_data(n_clicks,sql_query):
+#     if n_clicks is None:
+#         raise PreventUpdate
+#     else:
+#         df = get_data_as_data_frame(sql_query=sql_query, cursor= main_app.cursor)
+#         return dash_table.DataTable(data=df.to_dict('records'),columns=[{"name" : i, "id" : i} for i in df.columns])
 
 
-@main_app.app.callback(
-    Output("main-content-container","children"),
-    Input("execute_query","n_clicks"),
-    State("query","value")
-)
-def get_table_data(n_clicks,sql_query):
-    if n_clicks is None:
-        raise PreventUpdate
-    else:
-        df = get_data_as_data_frame(sql_query=sql_query, cursor= main_app.cursor)
-        return dash_table.DataTable(data=df.to_dict('records'),columns=[{"name" : i, "id" : i} for i in df.columns])
-
-
+# This function create graphs and filter buttons when the user log's in. And its also triggered when the refresh button is pressed 
 @main_app.app.callback(
         Output("filters","children"),
         Output("top_table","children"),
+        # Output("fig_1", "figure"),
         Input("refresh_button","n_clicks"),
         State("filter_type","value")
-
 )
 def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_type_value):
 
-
+    # gets all the required inputs from the environment.txt file
+    # all the values are converted to an array format and stored in corresponding variables
     filter_tables = main_app.environment_details['filter_table_names'].split(',')
     filter_tables_columns = main_app.environment_details['filter_table_columns'].split(',')
     filter_tables_labels = main_app.environment_details['filter_table_labels'].split(',')
@@ -80,6 +72,7 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
         
         sql_1 = f"select distinct {column_name} from {table_name}"
         data_frame = get_data_as_data_frame(sql_query=sql_1  , cursor= main_app.cursor)
+        # this was a old layout model for filter buttons
         # layout = html.Div([
         #     dbc.Label(column_label,className = "filter-label"),
         #     dcc.Dropdown(id = filter_id , 
@@ -88,6 +81,8 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
         #                multi= True,
         #                placeholder= f"Select {column_label} ... ")
         # ],className = "filter-card")
+
+        # this is the new layout model for the filter buttons with select all check box features
         layout = html.Div([
                     dbc.Label(column_label,className = "filter-label"),
                     dbc.DropdownMenu([
@@ -106,45 +101,56 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
         
         filters.append(layout)
 
-    sql_2 = "select RunID, `Rule Name` from technical_reconciliation"
+    sql_2 = main_app.environment_details["top_table_query"]
     
     data_frame = get_data_as_data_frame(sql_query=sql_2,cursor=main_app.cursor)
 
-    top_table = create_dash_table_from_data_frame(data_frame=data_frame, table_id = "run_table" , key_col_number= 1)
+    top_table = create_dash_table_from_data_frame(
+                    data_frame_original=data_frame, 
+                    table_id = main_app.environment_details["top_table_id"] , 
+                    key_col_number= int(main_app.environment_details["top_table_key_col_number"])
+            )
     
-    return filters,top_table
+    # pie_data_query = '''
+    # select "No.Of Rules Passed" as "Description", count(*) as "Count" from ( SELECT distinct `Rule Name`, `In_Scope`,`Success`, `Defects` FROM technical_reconciliation where `Defects` = 0) temp union all
+    # select "No.Of Rules Failed" as "Description", count(*) as "Count" from ( SELECT distinct `Rule Name`, `In_Scope`,`Success`, `Defects` FROM technical_reconciliation where `Defects` != 0) temp 
+    # '''
+
+    # pie_data = get_data_as_data_frame(sql_query=pie_data_query,cursor=main_app.cursor)
+    
+    # pie_chart = px.pie(data_frame = pie_data,
+    #             names = 'Description',
+    #             values = 'Count',
+    #             color='Description',
+    #             title = f"Total Rules = {pie_data.sum()['Count']}<br>No.of Rules Passed Vs No.of Rules Failed",
+    #             color_discrete_map={"No.Of Rules Failed":"red","No.Of Rules Passed":"lime"})
+
+    # pie_chart.update_traces(sort=False) 
+    
+    return filters,top_table#,pie_chart
 
 
+# Shows and hides the Filter buttons as per the selected DM or DQ radio button
+# first output will disable the filter buttons
+# second output will hide the filter buttons
 @main_app.app.callback(
         [Output(filter_id+"_drop_down" ,"disabled") for filter_id in main_app.environment_details['filter_ids'].split(',')],
         [Output(f"filter_card_{index}","style") for index in range(len(main_app.environment_details['filter_ids'].split(',')))],
+        # [Output("dashboard_content","children")],
+        [Output("data_migration_dashboard","style")],
+        [Output("data_quality_dashboard","style")],
         Input("filter_type","value")
-
 )
-def create_filter_buttons_figures_and_tables_and_refresh_data(filter_type_value):
+def change_filter_buttons_and_dashboard_content(filter_type_value):
     filter_types = main_app.environment_details['filter_types'].split(',')
     output1 = [False if flag == "common" or flag == filter_type_value else True for flag in filter_types]
     output2 = [{} if flag == "common" or flag == filter_type_value else {"display":"none"} for flag in filter_types]
-    return output1+output2
+    styles = [{"display" : "none"},{}] if filter_type_value == 'dq' else [{},{"display" : "none"}]
+    # print(f"(*****&&&&&&&&    {output1+output2+styles} ")
+    # dashboard_content = data_quality_dashboard if filter_type_value=='dq' else data_migration_dashboard
+    return output1+output2+styles
 
-#may be the below code can be understood and used in future
-
-# @main_app.app.callback(
-#     Output({"type" : "run_table_test" , 'index' : MATCH},"className"),
-#     # Output({"type" : "home_page_contents_bottom", "index":MATCH}, "children"),
-#     Input({"type" : "run_table_test" , "index" : MATCH },"n_clicks"),
-#     State({"type" : "run_table_test" , 'index' : MATCH},"key"),   
-#     prevent_initial_call = True 
-# )
-# def test(n_clicks,key):
-#     if main_app.table1 is None:
-#         main_app.table1 = Patch()
-#         print(main_app.table1)
-#     trigger_id = ctx.triggered_id
-#     print(key)   
-#     main_app.table1 = 1
-#     return "table-active"#,main_app.table1
-
+# changes the bottom table values as per the selected top table value
 @main_app.app.callback(
     Output("bottom_table", "children"),
     Output("fig_1", "figure"),
@@ -152,30 +158,34 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(filter_type_value)
     Output("loading_screen","style"),
     Output("bottom_table_failed_records","style",allow_duplicate=True),
     Output("bottom_table","style",allow_duplicate=True),
-    Input({"type" : "run_table" , "index" : ALL },"n_clicks"),
-    State({"type" : "run_table" , 'index' : ALL},"key"),   
+    Input({"type" : main_app.environment_details["top_table_id"] , "index" : ALL },"n_clicks"),
+    State({"type" : main_app.environment_details["top_table_id"] , 'index' : ALL},"key"),  
+    State("filter_type","value"),
     prevent_initial_call = True 
 )
-def change_graph_and_table_data(n_clicks,key):
+def change_graph_and_table_data(n_clicks,key,filter_type_value):
+
+    # if(filter_type_value == 'dm'):
+    #     raise PreventUpdate
+
     trigger_id = ctx.triggered_id
-
-    print(trigger_id)
-    print(f'key ===== {key}')
-    print(f"showing contents for selected Key = {key[trigger_id['index']]}")
-
     sql_query = f'select * from technical_reconciliation where `Rule Name` = "{key[trigger_id["index"]]}"'
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
 
     table = create_dash_table_from_data_frame(
-        data_frame=data_frame,table_id="bottom_table",
+        data_frame_original=data_frame,
+        table_id="bottom_table",
         key_col_number=1,
-        primary_kel_column_numbers=[1,2],
-        action_col_numbers=[11])
+        primary_kel_column_numbers=list(map(int,main_app.environment_details["bottom_table_primary_key_column_number"].split(","))),
+        action_col_numbers=[11],
+        col_numbers_to_omit=[12])
     
+    #uncomment the blow graph codes if needed
+
     #converting the RunID column to string data type:
     data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-    pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Selection_Success','Selection_Failure']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+    pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Success','Defects']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
                  names = "Success/Failre",
                  values="Count",
                  height= 244,
@@ -186,8 +196,8 @@ def change_graph_and_table_data(n_clicks,key):
     
     bar = px.bar(data_frame=data_frame,
         x = "RunID",
-        y = ["Selection_Success","Selection_Failure",],
-        color_discrete_map = {"Selection_Success":"green","Selection_Failure":"red"},
+        y = ["Success","Defects",],
+        color_discrete_map = {"Success":"green","Defects":"red"},
         title=f"{key[trigger_id['index']]} - Individual",
         barmode='group',
         height= 244,
@@ -210,6 +220,7 @@ def change_graph_and_table_data(n_clicks,key):
     ))
     
     return table,bar,pie,{"display":"none"},{"display" : "none"},{}
+    # return table,{"display":"none"},{"display" : "none"},{}
 
 # for now commenting this download feature. The details will be updated later
 
@@ -255,19 +266,36 @@ def show_failed_records(n_clicks,key):
     #this trigerred id is used to access the correct nclicks and key value from the array of inputs
     trigger_id = ctx.triggered_id
 
-    if(n_clicks[trigger_id['index']] is None):
+    if(n_clicks[trigger_id['index']] is None or int(key[trigger_id['index']]['column_data']) == 0):
         raise PreventUpdate
     
-    keys = f"Downloading failed data for : {key[trigger_id['index']]['primary_keys']}"
-    no_of_failed_records = int(key[trigger_id['index']]['column_data'])
-    sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
-    data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
-    failed_records = create_dash_table_from_data_frame(
-                        data_frame=data_frame,
-                        table_id="failed_records",
-                        key_col_number= 1,
-                        capital_headings=True
-                        )
+    keys = key[trigger_id['index']]['primary_keys']
+    # no_of_failed_records = int(key[trigger_id['index']]['column_data'])
+    
+
+    #creating a sql query to show temporary failed records
+    
+    failure_table_name = keys[2]["FD Table"]
+    no_of_failed_records = 0
+
+    try :
+        sql_query = f"select * from {failure_table_name}"
+        data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
+
+        no_of_failed_records = len(data_frame.index)
+        failed_records = create_dash_table_from_data_frame(
+                            data_frame_original=data_frame,
+                            table_id="failed_records",
+                            key_col_number= 1,
+                            capital_headings=True
+                            ) if no_of_failed_records != 0 else "No failed records to display"
+    except Error as e :
+        if e.errno == errorcode.ER_BAD_TABLE_ERROR :
+            failed_records = "No Table created in  backend for now"
+        elif e.errno == errorcode.ER_SYNTAX_ERROR :
+            failed_records = "Please check your SQL syntax"
+        else :
+            failed_records = "Something Unexpected happened please contact support"
 
     layout = html.Div([
         html.Div([
@@ -311,5 +339,3 @@ def download_data(n_clicks):
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
   
     return dcc.send_data_frame(data_frame.to_excel, "sample_download.xlsx", sheet_name="Failed_Data")
-
-

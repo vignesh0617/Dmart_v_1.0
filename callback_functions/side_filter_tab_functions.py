@@ -21,6 +21,10 @@ from dash.exceptions import PreventUpdate
 )
 def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*filter_values):
 
+    if(filter_type == 'dm'):
+        raise PreventUpdate
+
+
     table = None
     pie = px.bar()
     bar = px.bar()
@@ -56,7 +60,7 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
         
         data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-        pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Selection_Success','Selection_Failure']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+        pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Success','Defects']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
                 names = "Success/Failre",
                     values="Count",
                     height= 244,
@@ -67,8 +71,8 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
         
         bar = px.bar(data_frame=data_frame,
             x = "RunID",
-            y = ["Selection_Success","Selection_Failure",],
-            color_discrete_map = {"Selection_Success":"green","Selection_Failure":"red"},
+            y = ["Success","Defects",],
+            color_discrete_map = {"Success":"green","Defects":"red"},
             title=f"Individual",
             barmode='group',
             height= 244,
@@ -113,6 +117,7 @@ filter_ids = main_app.environment_details['filter_ids'].split(',')
 
 for i in range(len(filter_ids)):
     filter_id = filter_ids[i]
+    
     #trying to implement a new feature
     @main_app.app.callback(
         Output(filter_id+"_drop_down","label"),
@@ -123,7 +128,8 @@ for i in range(len(filter_ids)):
         # State(filter_id+"_select_all","value"),
     )
     def update_filter_label_and_options(value,options):
-
+        
+        print(f"***********************line 128 side filter table functions {filter_id}")
         if(len(value)==len(options)):
             return "All",True
         return str([item for item in value]).replace("[","").replace("]","").replace("'","") if len(value) !=0 else "None", None
