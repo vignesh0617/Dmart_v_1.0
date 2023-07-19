@@ -7,11 +7,14 @@ from components.navbar import navbar
 
 layout = html.Div([
     navbar,
-    "404 Page Not Found",
-    html.Br(),
-    dbc.Button("Go Back to Home", id="redirect", className="")
+    html.Div([
+        "404 Page Not Found",
+        html.Br(),
+        dbc.Button("Go Back to Home", id="redirect", className="")
+    ],id="page_not_found_body")
     
-])
+    
+],id="page_not_found_container")
 
 @callback(
     Output('url1',"pathname",allow_duplicate=True),
