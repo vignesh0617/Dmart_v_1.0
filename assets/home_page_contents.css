@@ -209,8 +209,8 @@ table td.table_action:hover{
 
 
 #data_migration_dashboard {
-    background-image: url("wip.jpg") ;   
-    transform: rotate(330deg) translatey(-200px);
-    height: 150vh;
-    width: 100vw;
+    background-image: url("wip2.avif") ;
+    height: 100%;
+    width: 70%;
+    margin : auto;
 }

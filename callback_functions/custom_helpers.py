@@ -34,7 +34,7 @@ class reconciliation_app:
     # def __str__(self) -> str:
     #     return (f'{self.connector} - {self.environment_details} ')
 
-main_app = reconciliation_app()
+main_app = reconciliation_app() 
 
 #for creating JWT
 def create_token(payload, 

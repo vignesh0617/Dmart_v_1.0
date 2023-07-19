@@ -10,11 +10,12 @@ from dash import no_update
 @main_app.app.callback(
     Output("password","type"),
     Output("show_hide_password","className"),
-    Input("show_hide_password","n_clicks")
+    Input("show_hide_password","n_clicks"),
+    prevent_initial_call =True
 )
 def show_hide_password(n_clicks):
-    if n_clicks  is None :
-        raise PreventUpdate
+    # if n_clicks  is None :
+    #     raise PreventUpdate
     if n_clicks%2 == 1:
         return "text","bi bi-eye-slash"
     return "password","bi bi-eye"
@@ -25,8 +26,8 @@ def show_hide_password(n_clicks):
     Output("url1","pathname"),
     Output("message","children"),
     Output("message","className"),
-    Input("submit_button","n_clicks"),
-    State("username","value"),
+    Input("submit_button","n_clicks"), 
+    State("username","value"), 
     State("password","value"),
     prevent_initial_call =True
     )
@@ -51,11 +52,11 @@ def login_handler(n_clicks,username, password):
 
 #checks if username and password is not empty in the login page
 @main_app.app.callback (
-    Output("username","invalid"),
+    Output("username","invalid"), 
     Output("password","invalid"),
     Input("username","value"),
     Input("password","value"),
-    Input("submit_button","n_clicks")
+    Input("submit_button","n_clicks"),
     )
 def validate_form(username, password, n_clicks):
     if n_clicks is None:

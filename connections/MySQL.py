@@ -10,7 +10,7 @@ def get_connection(username,password):
             password = password, 
             host = main_app.environment_details['host'] , 
             database = main_app.environment_details["database_name"],
-            autocommit =True)
+            autocommit =True) 
         return connector,connector.cursor(),True
     except Exception as e:
         print(f"Something Unexpected happened inside MySQL: {e}")

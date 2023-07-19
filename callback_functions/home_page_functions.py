@@ -47,7 +47,7 @@ from mysql.connector import errorcode, Error
 @main_app.app.callback(
         Output("filters","children"),
         Output("top_table","children"),
-        # Output("fig_1", "figure"),
+        Output("fig_1", "figure"),
         Input("refresh_button","n_clicks"),
         State("filter_type","value")
 )
@@ -111,23 +111,33 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
                     key_col_number= int(main_app.environment_details["top_table_key_col_number"])
             )
     
-    # pie_data_query = '''
-    # select "No.Of Rules Passed" as "Description", count(*) as "Count" from ( SELECT distinct `Rule Name`, `In_Scope`,`Success`, `Defects` FROM technical_reconciliation where `Defects` = 0) temp union all
-    # select "No.Of Rules Failed" as "Description", count(*) as "Count" from ( SELECT distinct `Rule Name`, `In_Scope`,`Success`, `Defects` FROM technical_reconciliation where `Defects` != 0) temp 
-    # '''
+    pie_data_query = '''
+    select "No.Of Rules Passed" as "Description", count(*) as "Count" from ( SELECT distinct `Rule Name`, `In_Scope`,`Success`, `Defects` FROM technical_reconciliation where `Defects` = 0) temp union all
+    select "No.Of Rules Failed" as "Description", count(*) as "Count" from ( SELECT distinct `Rule Name`, `In_Scope`,`Success`, `Defects` FROM technical_reconciliation where `Defects` != 0) temp 
+    '''
 
-    # pie_data = get_data_as_data_frame(sql_query=pie_data_query,cursor=main_app.cursor)
+    pie_data = get_data_as_data_frame(sql_query=pie_data_query,cursor=main_app.cursor)
     
-    # pie_chart = px.pie(data_frame = pie_data,
-    #             names = 'Description',
-    #             values = 'Count',
-    #             color='Description',
-    #             title = f"Total Rules = {pie_data.sum()['Count']}<br>No.of Rules Passed Vs No.of Rules Failed",
-    #             color_discrete_map={"No.Of Rules Failed":"red","No.Of Rules Passed":"lime"})
+    pie_chart = px.pie(data_frame = pie_data,
+                names = 'Description',
+                height=244,
+                width=344,
+                values = 'Count',
+                color='Description',
+                title = f"Total Rules = {pie_data.sum()['Count']}<br>No.of Rules Passed Vs No.of Rules Failed",
+                color_discrete_map={"No.Of Rules Failed":"red","No.Of Rules Passed":"lime"})
 
-    # pie_chart.update_traces(sort=False) 
+    pie_chart.update_traces(sort=False) 
+
+    pie_chart.update_layout(legend=dict(
+    orientation="h",
+    yanchor="bottom",
+    y=-1,
+    xanchor="right",
+    x=1
+    ))
     
-    return filters,top_table#,pie_chart
+    return filters,top_table,pie_chart
 
 
 # Shows and hides the Filter buttons as per the selected DM or DQ radio button
@@ -153,7 +163,7 @@ def change_filter_buttons_and_dashboard_content(filter_type_value):
 # changes the bottom table values as per the selected top table value
 @main_app.app.callback(
     Output("bottom_table", "children"),
-    Output("fig_1", "figure"),
+    # Output("fig_1", "figure"),
     Output("fig_2", "figure"),
     Output("loading_screen","style"),
     Output("bottom_table_failed_records","style",allow_duplicate=True),
@@ -180,46 +190,66 @@ def change_graph_and_table_data(n_clicks,key,filter_type_value):
         action_col_numbers=[11],
         col_numbers_to_omit=[12])
     
+    data_frame["In_Scope_%"] = 100
+    data_frame["Success_%"] = data_frame["Success"]/data_frame["In_Scope"]*100
+    data_frame["Defects_%"] = data_frame["Defects"]/data_frame["In_Scope"]*100
+    line_chart_data = data_frame.melt(id_vars = ['RunID','In_Scope','Success','Defects'],value_vars=['In_Scope_%','Success_%','Defects_%'],
+                        var_name='Description',value_name='Percentage')
+
+
+
+    line_chart = px.line(data_frame = line_chart_data ,
+                        height=244,
+                        width=344,
+                        x="RunID",
+                        y='Percentage' , 
+                        color = 'Description',
+                        color_discrete_map = {'In_Scope_%':'blue','Success_%':'green','Defects_%':'red'}
+                        )
+
+    
     #uncomment the blow graph codes if needed
 
-    #converting the RunID column to string data type:
-    data_frame["RunID"] = data_frame["RunID"].astype("string")
+    # #converting the RunID column to string data type:
+    # data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-    pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Success','Defects']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
-                 names = "Success/Failre",
-                 values="Count",
-                 height= 244,
-                 width= 344,
-                 title= f"{key[trigger_id['index']]} - Cumulative",
-                 color_discrete_sequence = ["green","red"]
-                )
+    # pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Success','Defects']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+    #              names = "Success/Failre",
+    #              values="Count",
+    #              height= 244,
+    #              width= 344,
+    #              title= f"{key[trigger_id['index']]} - Cumulative",
+    #              color_discrete_sequence = ["green","red"]
+    #             )
     
-    bar = px.bar(data_frame=data_frame,
-        x = "RunID",
-        y = ["Success","Defects",],
-        color_discrete_map = {"Success":"green","Defects":"red"},
-        title=f"{key[trigger_id['index']]} - Individual",
-        barmode='group',
-        height= 244,
-        width= 344,)
+    # bar = px.bar(data_frame=data_frame,
+    #     x = "RunID",
+    #     y = ["Success","Defects",],
+    #     color_discrete_map = {"Success":"green","Defects":"red"},
+    #     title=f"{key[trigger_id['index']]} - Individual",
+    #     barmode='group',
+    #     height= 244,
+    #     width= 344,)
     
-    bar.update_layout(legend=dict(
-    orientation="h",
-    yanchor="bottom",
-    y=-2,
-    xanchor="right",
-    x=1
-    ))
+    # bar.update_layout(legend=dict(
+    # orientation="h",
+    # yanchor="bottom",
+    # y=-2,
+    # xanchor="right",
+    # x=1
+    # ))
 
-    pie.update_layout(legend=dict(
-    orientation="h",
-    yanchor="bottom",
-    y=-1,
-    xanchor="right",
-    x=1
-    ))
+    # pie.update_layout(legend=dict(
+    # orientation="h",
+    # yanchor="bottom",
+    # y=-1,
+    # xanchor="right",
+    # x=1
+    # ))
     
-    return table,bar,pie,{"display":"none"},{"display" : "none"},{}
+    
+    return table,line_chart,{"display":"none"},{"display" : "none"},{} # this ouput is for returning without pie chart
+    # return table,bar,pie,{"display":"none"},{"display" : "none"},{}
     # return table,{"display":"none"},{"display" : "none"},{}
 
 # for now commenting this download feature. The details will be updated later

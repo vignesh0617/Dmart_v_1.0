@@ -10,7 +10,7 @@ from dash.exceptions import PreventUpdate
 #this function will apply the filter values to technical recon view and show the output in dashboard home page
 @main_app.app.callback(
     Output("bottom_table", "children",allow_duplicate=True),
-    Output("fig_1", "figure",allow_duplicate=True),
+    # Output("fig_1", "figure",allow_duplicate=True),
     Output("fig_2", "figure",allow_duplicate=True),
     Output("bottom_table_failed_records","style",allow_duplicate=True),
     Output("bottom_table","style",allow_duplicate=True),
@@ -21,13 +21,14 @@ from dash.exceptions import PreventUpdate
 )
 def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*filter_values):
 
-    if(filter_type == 'dm'):
-        raise PreventUpdate
+    # if(filter_type == 'dm'):
+    #     raise PreventUpdate
 
 
     table = None
-    pie = px.bar()
-    bar = px.bar()
+    # pie = px.bar()
+    # bar = px.bar()
+    line_chart = px.line()
 
     filter_columns = main_app.environment_details['filter_table_columns'].split(',')
 
@@ -60,45 +61,65 @@ def change_table_and_graph_data_for_technical_recon_view(n_clicks,filter_type,*f
         
         data_frame["RunID"] = data_frame["RunID"].astype("string")
 
-        pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Success','Defects']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
-                names = "Success/Failre",
-                    values="Count",
-                    height= 244,
-                    width= 344,
-                    title= f"Cumulative",
-                    color_discrete_sequence = ["green","red"]
-                    )
+        # pie = px.pie(data_frame= data_frame.loc[:,['RunID','In_Scope','Success','Defects']].melt(id_vars=["RunID","In_Scope"],var_name= "Success/Failre", value_name= "Count"),
+        #         names = "Success/Failre",
+        #             values="Count",
+        #             height= 244,
+        #             width= 344,
+        #             title= f"Cumulative",
+        #             color_discrete_sequence = ["green","red"]
+        #             )
         
-        bar = px.bar(data_frame=data_frame,
-            x = "RunID",
-            y = ["Success","Defects",],
-            color_discrete_map = {"Success":"green","Defects":"red"},
-            title=f"Individual",
-            barmode='group',
-            height= 244,
-            width= 344,)
+        # bar = px.bar(data_frame=data_frame,
+        #     x = "RunID",
+        #     y = ["Success","Defects",],
+        #     color_discrete_map = {"Success":"green","Defects":"red"},
+        #     title=f"Individual",
+        #     barmode='group',
+        #     height= 244,
+        #     width= 344,)
         
-        bar.update_layout(legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=-2,
-        xanchor="right",
-        x=1
-        ))
+        # bar.update_layout(legend=dict(
+        # orientation="h",
+        # yanchor="bottom",
+        # y=-2,
+        # xanchor="right",
+        # x=1
+        # ))
 
-        pie.update_layout(legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=-1,
-        xanchor="right",
-        x=1
-        ))
+        # pie.update_layout(legend=dict(
+        # orientation="h",
+        # yanchor="bottom",
+        # y=-1,
+        # xanchor="right",
+        # x=1
+        # ))
+
+        data_frame["In_Scope_%"] = 100
+        data_frame["Success_%"] = data_frame["Success"]/data_frame["In_Scope"]*100
+        data_frame["Defects_%"] = data_frame["Defects"]/data_frame["In_Scope"]*100
+        line_chart_data = data_frame.melt(id_vars = ['RunID','In_Scope','Success','Defects'],value_vars=['In_Scope_%','Success_%','Defects_%'],
+                            var_name='Description',value_name='Percentage')
+
+
+
+        line_chart = px.line(data_frame = line_chart_data ,
+                            height=244,
+                            width=344,
+                            x="RunID",
+                            y='Percentage' , 
+                            color = 'Description',
+                            color_discrete_map = {'In_Scope_%':'blue','Success_%':'green','Defects_%':'red'}
+                            )
+            
     else :
         table = "No contents found for the applied filter"
     
     print("-------------------Filter Applied-----------------")
     print(sql_query)
-    return table,bar,pie,{"display":"none"},{}
+
+    return table,line_chart,{"display":"none"},{}
+    # return table,line,pie,{"display":"none"},{}
 
 @main_app.app.callback(
     # [Output(filter_id+"_select_all","value") for filter_id in main_app.environment_details["filter_ids"].split(",")],
@@ -117,7 +138,7 @@ filter_ids = main_app.environment_details['filter_ids'].split(',')
 
 for i in range(len(filter_ids)):
     filter_id = filter_ids[i]
-    
+
     #trying to implement a new feature
     @main_app.app.callback(
         Output(filter_id+"_drop_down","label"),
@@ -129,7 +150,6 @@ for i in range(len(filter_ids)):
     )
     def update_filter_label_and_options(value,options):
         
-        print(f"***********************line 128 side filter table functions {filter_id}")
         if(len(value)==len(options)):
             return "All",True
         return str([item for item in value]).replace("[","").replace("]","").replace("'","") if len(value) !=0 else "None", None
