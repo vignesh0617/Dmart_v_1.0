@@ -14,7 +14,7 @@ class reconciliation_app:
         
     #used to read the environment.txt file and assign the values to reconciliation_app
     def assign_environment_details(self):
-        file = open("environment.txt","r")
+        file = open(file = "environment.txt",mode ="r")
         for line in file:
             if(line != "\n" and line.replace(" ","")!=""):
                 for[key,value] in [line.rstrip().split(" = ")]:
@@ -52,10 +52,10 @@ def decode_token(token,
 # data_frame_original ---> table will be created based on this dataframe
 # table_id ---> this table id should be unique for identifying a table
 # key_col_number ----> 0th index. each row will store this correspoding data_frame_original.iloc[<row>,key_column_number] in its "key" attribute. This can be used later if required
-# action_col_number ---> a link kind of style will be applied to col_number mentioned here. Define a corresponding function to get executed when this data is pressed
+# action_col_number --->0th index. a link kind of style will be applied to col_number mentioned here. Define a corresponding function to get executed when this data is pressed
 # primary_key_col_numbers ----> index's mentioned here, will get saved in form of dicitonary [{"col name1" : "vale1" },{"col name2" : "vale2" }......{{"col namen" : "valen" }}]
 # capital_headings ----> Headings of the table header will be Capital letters if this value is True else it will be Title
-# col_numbers_to_omit ----> these index's will be omitted while creating tables in front end  
+# col_numbers_to_omit ---->0th index. these index's will be omitted while creating tables in front end  
 def create_dash_table_from_data_frame(
         data_frame_original,
         table_id,
@@ -67,7 +67,7 @@ def create_dash_table_from_data_frame(
     ):
 
     # creates a duplicate data_frame which will omit the col_number mentioned in  "col_numbers_to_omit"
-    if len(col_numbers_to_omit)!=0:
+    if col_numbers_to_omit: # this if block will execute only if col_numbers_to_omit array is not empty
         col_range = []
         for i in range(data_frame_original.shape[1]):
             if(i not in col_numbers_to_omit):
@@ -127,3 +127,23 @@ def create_dash_table_from_data_frame(
     ],id = table_id ,className="table table-hover table-light")
 
     return final_table
+
+
+#this will read the queries from queries.txt file and return a dictionary as { table_name1 : query1, table_name2 : query2 .... }
+def return_sql_queries_from_file():
+    file = open(file = "queries.txt",mode = 'r')
+    lines = file.readlines()
+    queries = {}
+    temp_query = ""
+    table_name = ""
+    for line in lines :
+        if len(line.strip()) :
+            if line.lower().find("table_name :") != -1 or line.lower().find("view_name :") != -1:
+                table_name = line.split(" : ")[1][:-1]
+            elif line[-2] != ";":
+                temp_query+=line
+            elif line[-2] == ";":
+                temp_query+=line[:-2]
+                queries[table_name] = temp_query
+                temp_query = ""
+    return queries
