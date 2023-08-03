@@ -12,5 +12,4 @@ layout = html.Div([
         html.Div(id="bottom_table",className = "bottom-table"),
         html.Div(id="bottom_table_failed_records",className="bottom-table-failed-records")
     ],id="home_page_contents_bottom",className="home-page-contents-bottom"),
-    # "Testing"
 ],id = "data_quality_dashboard")

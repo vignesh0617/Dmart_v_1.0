@@ -1,0 +1,154 @@
+1) Table_name : dfkkbptaxnum
+CREATE TABLE `dfkkbptaxnum` (
+  `CLIENT` int DEFAULT NULL,
+  `PARTNER` int DEFAULT NULL,
+  `TAXTYPE` varchar(4) DEFAULT NULL,
+  `TAXNUM` varchar(16) DEFAULT NULL,
+  `TAXNUMXL` varchar(1) DEFAULT NULL,
+  `LOAD_DATE` decimal(17,12) DEFAULT NULL
+);
+
+
+2) Table_name : dqdataobject
+CREATE TABLE `dqdataobject` (
+  `ObjectID` int DEFAULT NULL,
+  `ObjectName` varchar(50) DEFAULT NULL
+);
+
+
+3) Table_name : dqfailuretable
+CREATE TABLE `dqfailuretable` (
+  `FailureTableID` varchar(10) DEFAULT NULL,
+  `RuleId` varchar(25) DEFAULT NULL,
+  `FailureTableName` varchar(50) DEFAULT NULL,
+  `PrimaryFlag` varchar(2) DEFAULT NULL
+);
+
+
+4) Table_name : dqmain
+CREATE TABLE `dqmain` (
+  `Environment` varchar(50) DEFAULT NULL,
+  `Rollout` varchar(50) DEFAULT NULL,
+  `Region` varchar(50) DEFAULT NULL,
+  `Country` varchar(50) DEFAULT NULL,
+  `Process_Area` varchar(50) DEFAULT NULL
+);
+
+
+5) Table_name : dqphase
+CREATE TABLE `dqphase` (
+  `PhaseID` int DEFAULT NULL,
+  `Phasename` varchar(50) DEFAULT NULL
+);
+
+
+6) Table_name : dqprocess
+CREATE TABLE `dqprocess` (
+  `RuleID` varchar(25) DEFAULT NULL,
+  `Process_Area` varchar(50) DEFAULT NULL,
+  `Updated_Date` date DEFAULT NULL
+);
+
+
+7) Table_name : dqqualitydimension
+CREATE TABLE `dqqualitydimension` (
+  `QUALDIMID` int DEFAULT NULL,
+  `QUALDIMNAME` varchar(20) DEFAULT NULL
+);
+
+
+8) Table_name : dqruleinfo
+CREATE TABLE `dqruleinfo` (
+  `RULEID` varchar(25) DEFAULT NULL,
+  `RULENAME` varchar(255) DEFAULT NULL,
+  `RULEDESC` varchar(255) DEFAULT NULL,
+  `RULETYPEID` varchar(255) DEFAULT NULL,
+  `SYSTEMID` varchar(255) DEFAULT NULL,
+  `PHASEID` varchar(255) DEFAULT NULL,
+  `OBJECTID` varchar(255) DEFAULT NULL,
+  `STEWARDID` varchar(255) DEFAULT NULL,
+  `TeamRespDeptId` varchar(255) DEFAULT NULL,
+  `QUALDIMID` varchar(255) DEFAULT NULL,
+  `SCHEDULEID` varchar(255) DEFAULT NULL,
+  `UOM` varchar(255) DEFAULT NULL,
+  `PRIORITY` varchar(255) DEFAULT NULL,
+  `IMPACT` varchar(255) DEFAULT NULL,
+  `MIGRATIONUSE` varchar(255) DEFAULT NULL,
+  `AMBERLOWERLIMIT` decimal(28,1) DEFAULT NULL,
+  `AMBERUPPERLIMIT` decimal(28,1) DEFAULT NULL
+);
+
+
+9) Table_name : dqruletype
+CREATE TABLE `dqruletype` (
+  `RuleTypeID` int DEFAULT NULL,
+  `RuleTypeName` varchar(50) DEFAULT NULL
+);
+
+
+10) Table_name : dqrunregister
+CREATE TABLE `dqrunregister` (
+  `RegId` int DEFAULT NULL,
+  `RuleId` varchar(25) DEFAULT NULL,
+  `SourceCount` int DEFAULT NULL,
+  `PrevExceptionCount` int DEFAULT NULL,
+  `ExceptionCount` int DEFAULT NULL,
+  `DMRunId` int DEFAULT NULL,
+  `Sysdate` date DEFAULT NULL,
+  `WorkflowName` varchar(255) DEFAULT NULL,
+  `Status` varchar(255) DEFAULT NULL
+);
+
+
+11) Table_name : dqschedule
+CREATE TABLE `dqschedule` (
+  `ScheduleID` int DEFAULT NULL,
+  `ScheduleName` varchar(50) DEFAULT NULL
+);
+
+
+12) Table_name : dqsteward
+CREATE TABLE `dqsteward` (
+  `stewardID` int DEFAULT NULL,
+  `stewardname` varchar(50) DEFAULT NULL,
+  `TeamID` int DEFAULT NULL
+);
+
+
+13) Table_name : dqsystem
+CREATE TABLE `dqsystem` (
+  `SYSTEMID` int DEFAULT NULL,
+  `SYSTEMNAME` varchar(50) DEFAULT NULL,
+  `PRIORITY` varchar(20) DEFAULT NULL
+);
+
+
+14) Table_name : dqteam
+CREATE TABLE `dqteam` (
+  `TeamID` int NOT NULL,
+  `TeamName` varchar(50) DEFAULT NULL,
+  `ShortName` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`TeamID`)
+);
+
+
+15) View_name : technical_reconciliation
+CREATE VIEW `technical_reconciliation` AS 
+select `dqrunregister`.`DMRunId` AS `RunID`,
+`dqruleinfo`.`OBJECTID` AS `Process Area`,
+`dqmain`.`Environment` AS `Environment`,
+`dqmain`.`Rollout` AS `Rollout`,
+`dqmain`.`Region` AS `Region`,
+`dqmain`.`Country` AS `Country`,
+`dqruleinfo`.`RULEID` AS `RuleID`,
+`dqruleinfo`.`RULENAME` AS `Rule Name`,
+`dqruleinfo`.`RULEDESC` AS `Rule Description`,
+`dqrunregister`.`SourceCount` AS `In_Scope`,
+(`dqrunregister`.`SourceCount` - `dqrunregister`.`ExceptionCount`) AS `Success`,
+`dqrunregister`.`ExceptionCount` AS `Defects`,
+`dqfailuretable`.`FailureTableName` AS `FD Table` 
+from (((`dqrunregister` join `dqruleinfo` 
+on((`dqrunregister`.`RuleId` = `dqruleinfo`.`RULEID`))) 
+join `dqmain` on((`dqruleinfo`.`OBJECTID` = `dqmain`.`Process_Area`))) 
+join `dqfailuretable` on((`dqruleinfo`.`RULEID` = `dqfailuretable`.`RuleId`)));
+

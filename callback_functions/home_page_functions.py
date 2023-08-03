@@ -155,7 +155,7 @@ def change_filter_buttons_and_dashboard_content(filter_type_value):
     filter_types = main_app.environment_details['filter_types'].split(',')
     output1 = [False if flag == "common" or flag == filter_type_value else True for flag in filter_types]
     output2 = [{} if flag == "common" or flag == filter_type_value else {"display":"none"} for flag in filter_types]
-    styles = [{"display" : "none"},{}] if filter_type_value == 'dq' else [{},{"display" : "none"}]
+    styles = [{"display" : "none"},{"display" : "block"}] if filter_type_value == 'dq' else [{"display" : "block"},{"display" : "none"}]
     # print(f"(*****&&&&&&&&    {output1+output2+styles} ")
     # dashboard_content = data_quality_dashboard if filter_type_value=='dq' else data_migration_dashboard
     return output1+output2+styles
@@ -300,6 +300,17 @@ def show_failed_records(n_clicks,key):
         raise PreventUpdate
     
     keys = key[trigger_id['index']]['primary_keys']
+    print()
+    print()
+    print()
+    print("--------------")
+    print(key)
+    print("+++++++++")
+    print(keys)
+    print("==========")
+    print()
+    print()
+    print()
     # no_of_failed_records = int(key[trigger_id['index']]['column_data'])
     
 
@@ -309,9 +320,9 @@ def show_failed_records(n_clicks,key):
     no_of_failed_records = 0
 
     try :
-        sql_query = f"select * from {failure_table_name}"
+        sql_query = f"select * from {failure_table_name} where `RunID` = {keys[0]['RunID']}"
         data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
-
+        print(sql_query)
         no_of_failed_records = len(data_frame.index)
         failed_records = create_dash_table_from_data_frame(
                             data_frame_original=data_frame,
@@ -334,6 +345,7 @@ def show_failed_records(n_clicks,key):
             html.Button(id="download_data_excel", 
                         className = f"bi bi-download btn-theme1 {'disabled' if no_of_failed_records == 0 else ''}",
                         disabled= True if no_of_failed_records == 0 else False),
+            dcc.Input(id="data_download_query",value=sql_query,style={"display":"none"}) # this query data will be used to download the data to an excel file
         ],className="failed-records-header"),
         html.Div([
             failed_records
@@ -358,14 +370,15 @@ def  show_and_hide_failed_records(n_clicks):
 @main_app.app.callback(
     Output("data_to_download","data"),
     Input("download_data_excel","n_clicks"),
+    State("data_download_query","value"),
     prevent_initial_call = True
 )
-def download_data(n_clicks):
+def download_data(n_clicks,sql_query):
 
     if(n_clicks is None):
         raise PreventUpdate
     
-    sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
+    # sql_query = "select LIFNR, NAME1, NAME2, ORT01, ORT02, REGIO, STRAS, ADRNR from vw_lfa1_city_fields_blank"
     data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
   
     return dcc.send_data_frame(data_frame.to_excel, "sample_download.xlsx", sheet_name="Failed_Data")
