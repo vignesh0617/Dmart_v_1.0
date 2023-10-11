@@ -50,6 +50,7 @@
 
 html *::-webkit-scrollbar,
 .main-content::-webkit-scrollbar,
+.data-migration-bottom-table::-webkit-scrollbar,
 .home-page-contents-bottom::-webkit-scrollbar{
     width: 4px;
     height: 4px;
@@ -58,6 +59,7 @@ html *::-webkit-scrollbar,
 
 html *::-webkit-scrollbar,
 .main-content::-webkit-scrollbar-thumb,
+.data-migration-bottom-table::-webkit-scrollbar-thumb,
 .home-page-contents-bottom::-webkit-scrollbar-thumb{
     background-color: #00000069;
     border-radius: 100px;
@@ -65,6 +67,7 @@ html *::-webkit-scrollbar,
 
 html *::-webkit-scrollbar,
 .main-content::-webkit-scrollbar-track,
+.data-migration-bottom-table::-webkit-scrollbar-track,
 .home-page-contents-bottom::-webkit-scrollbar-track{
     background-color: transparent;
     opacity: 0;
@@ -208,10 +211,3 @@ table td.table_action:hover{
 }
 
 
-#data_migration_dashboard {
-    background-image: url("wip2.avif") ;
-    height: 100%;
-    width: 70%;
-    margin : auto;
-    display: none;
-}

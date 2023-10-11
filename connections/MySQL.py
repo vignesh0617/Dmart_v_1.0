@@ -52,10 +52,3 @@ def get_data_as_data_frame(sql_query,cursor):
     data = cursor.fetchall()
     column_labels = [row[0] for row in fields]
     return pd.DataFrame(data = data, columns= column_labels)
-
-
-
-
-
-
-
