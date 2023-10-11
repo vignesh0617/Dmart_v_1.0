@@ -48,6 +48,11 @@ from mysql.connector import errorcode, Error
         Output("filters","children"),
         Output("top_table","children"),
         Output("fig_1", "figure"),
+        Output("data_migration_bottom_table","children"),
+        Output("fig_3", "figure"),
+        Output("fig_4", "figure"),
+        Output("fig_5", "figure"),
+        Output("fig_6", "figure"),
         Input("refresh_button","n_clicks"),
         State("filter_type","value")
 )
@@ -137,7 +142,35 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
     x=1
     ))
     
-    return filters,top_table,pie_chart
+
+
+    sql_query = f"select * from DM_Summary"
+
+    data_frame = get_data_as_data_frame(sql_query=sql_query,cursor=main_app.cursor)
+
+    dm_summary_table = create_dash_table_from_data_frame(
+        data_frame_original=data_frame,
+        table_id="data_migration_bottom_table_contents",
+        key_col_number=1,
+        # primary_kel_column_numbers=list(map(int,main_app.environment_details["bottom_table_primary_key_column_number"].split(","))),
+        # action_col_numbers=[11],
+        # col_numbers_to_omit=[12]
+        )
+
+    pie_data1 = pd.DataFrame(columns=['Type','Count'],index=['1','2'],data=[['Success',2389],['Failure',455]])
+    
+    pie_chart1 = px.pie(data_frame=pie_data1,
+                   values = pie_data1.columns[1],
+                   names = pie_data1.columns[0],
+                   title = 'Success vs Failure',
+                   color_discrete_sequence = ['#61876E','#FB2576'],
+                   hole = 0.45,
+                   width =250,
+                   height=200)
+    
+    pie_chart1.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+
+    return filters,top_table,pie_chart,dm_summary_table,pie_chart1,pie_chart1,pie_chart1,pie_chart1
 
 
 # Shows and hides the Filter buttons as per the selected DM or DQ radio button
@@ -146,7 +179,6 @@ def create_filter_buttons_figures_and_tables_and_refresh_data(n_clicks,filter_ty
 @main_app.app.callback(
         [Output(filter_id+"_drop_down" ,"disabled") for filter_id in main_app.environment_details['filter_ids'].split(',')],
         [Output(f"filter_card_{index}","style") for index in range(len(main_app.environment_details['filter_ids'].split(',')))],
-        # [Output("dashboard_content","children")],
         [Output("data_migration_dashboard","style")],
         [Output("data_quality_dashboard","style")],
         Input("filter_type","value")
@@ -156,27 +188,21 @@ def change_filter_buttons_and_dashboard_content(filter_type_value):
     output1 = [False if flag == "common" or flag == filter_type_value else True for flag in filter_types]
     output2 = [{} if flag == "common" or flag == filter_type_value else {"display":"none"} for flag in filter_types]
     styles = [{"display" : "none"},{"display" : "block"}] if filter_type_value == 'dq' else [{"display" : "block"},{"display" : "none"}]
-    # print(f"(*****&&&&&&&&    {output1+output2+styles} ")
-    # dashboard_content = data_quality_dashboard if filter_type_value=='dq' else data_migration_dashboard
     return output1+output2+styles
 
 # changes the bottom table values as per the selected top table value
 @main_app.app.callback(
-    Output("bottom_table", "children"),
-    # Output("fig_1", "figure"),
+    Output("bottom_table_container", "children"),
     Output("fig_2", "figure"),
     Output("loading_screen","style"),
     Output("bottom_table_failed_records","style",allow_duplicate=True),
-    Output("bottom_table","style",allow_duplicate=True),
-    Input({"type" : main_app.environment_details["top_table_id"] , "index" : ALL },"n_clicks"),
-    State({"type" : main_app.environment_details["top_table_id"] , 'index' : ALL},"key"),  
+    Output("bottom_table_container","style",allow_duplicate=True),
+    Input({"type" : f'{main_app.environment_details["top_table_id"]}_row_number', "index" : ALL },"n_clicks"),
+    State({"type" : f'{main_app.environment_details["top_table_id"]}_row_number' , 'index' : ALL},"key"),  
     State("filter_type","value"),
     prevent_initial_call = True 
 )
 def change_graph_and_table_data(n_clicks,key,filter_type_value):
-
-    # if(filter_type_value == 'dm'):
-    #     raise PreventUpdate
 
     trigger_id = ctx.triggered_id
     sql_query = f'select * from technical_reconciliation where `Rule Name` = "{key[trigger_id["index"]]}"'
@@ -286,7 +312,7 @@ def change_graph_and_table_data(n_clicks,key,filter_type_value):
 @main_app.app.callback(
     Output("bottom_table_failed_records","children"),
     Output("bottom_table_failed_records","style",allow_duplicate=True),
-    Output("bottom_table","style",allow_duplicate=True),
+    Output("bottom_table_container","style",allow_duplicate=True),
     Input({"type" : "bottom_table_row_data","index" :  ALL},"n_clicks"),
     State({"type" : "bottom_table_row_data","index":ALL},"key"),
     prevent_initial_call = True
@@ -300,20 +326,7 @@ def show_failed_records(n_clicks,key):
         raise PreventUpdate
     
     keys = key[trigger_id['index']]['primary_keys']
-    print()
-    print()
-    print()
-    print("--------------")
-    print(key)
-    print("+++++++++")
-    print(keys)
-    print("==========")
-    print()
-    print()
-    print()
-    # no_of_failed_records = int(key[trigger_id['index']]['column_data'])
     
-
     #creating a sql query to show temporary failed records
     
     failure_table_name = keys[2]["FD Table"]
@@ -356,7 +369,7 @@ def show_failed_records(n_clicks,key):
 
 @main_app.app.callback(
     Output("bottom_table_failed_records","style",allow_duplicate=True),
-    Output("bottom_table","style",allow_duplicate=True),
+    Output("bottom_table_container","style",allow_duplicate=True),
     Input("failed_records_header_back_button","n_clicks"),
     prevent_initial_call = True,
 )

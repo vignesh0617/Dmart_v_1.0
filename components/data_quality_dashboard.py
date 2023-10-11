@@ -9,7 +9,7 @@ layout = html.Div([
         html.Div(id="top_table",className="top-table")
     ],id="home_page_contents_top",className="home-page-contents-top"),
     html.Div([
-        html.Div(id="bottom_table",className = "bottom-table"),
+        html.Div(id="bottom_table_container",className = "bottom-table"),
         html.Div(id="bottom_table_failed_records",className="bottom-table-failed-records")
     ],id="home_page_contents_bottom",className="home-page-contents-bottom"),
 ],id = "data_quality_dashboard")

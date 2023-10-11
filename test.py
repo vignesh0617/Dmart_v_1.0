@@ -5,3 +5,4 @@ connector =  sql.connnect(username = "root", password = "root" , host = "localho
 
 df = pd.read_sql(sql = "select * from dqsteward")
 
+378867
